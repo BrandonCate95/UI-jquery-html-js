@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+<script language="javascript">
+
+$(function() {
+	$(document).on("click", "#getSearchVolume", function(){
+
+		var http = new XMLHttpRequest();
+		console.log("run1");
+		var keyword = document.getElementById("keyword").value;
+		
+		var formData = new FormData();
+		formData.append("keywords", keyword);
+		
+		//http.open("POST", "http://localhost/googleads-php-lib/examples/AdWords/v201710/Optimization/GetKeywordIdeas.php", true);
+		//http.send(formData);
+
+		//http.onreadystatechange = function() {//Call a function when the state changes.
+		//	if(http.readyState == 4 && http.status == 200) {
+		//		console.log("state change 1");
+		//		var JSONString = http.responseText;
+		//		var JSONObject = JSON.parse(JSON.parse(JSONString)); //There are two parses here as the first strips outer quotes and forward slashes while the second converts now readable JSON string into JSON object
+				//document.getElementById("textarea").innerHTML = JSONString;
+		//		document.getElementById("textarea").innerHTML = JSONObject;
+				
+		//	}
+		//}
+
+		var request = $.ajax({
+			url:"http://localhost/googleads-php-lib/examples/AdWords/v201710/Optimization/GetKeywordIdeas.php",
+			type: "post",
+			data: formData,
+			async: false		
+		});
+		
+		request.done(function (response, textStatus, jqXHR){
+        // Log a message to the console
+        console.log("Hooray, it worked!");
+		});
+
+		// Callback handler that will be called on failure
+		request.fail(function (jqXHR, textStatus, errorThrown){
+        // Log the error to the console
+        console.error(
+            "The following error occurred: "+
+            textStatus, errorThrown
+        );
+		});
+
+
+		
+	});
+});
+
+</script>
+</head>
+<body>
+
+<input type="button" id="getSearchVolume" name="getSearchVolume" value="Get Search Volume">
+<input type="text" id="keyword" name="keyword" placeholder="Keyword(s)...">
+
+<br>
+
+<textarea readonly id= "textarea" placeholder="Relevant data from list, describe, and create table will show up here" style="width:600px; height:400px"></textarea>
+
+
+</body>
+
+</html>

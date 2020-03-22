@@ -1,0 +1,137 @@
+.row{
+	padding:0;
+	margin:0;
+}
+
+.col-fixed-300{
+    position:fixed;
+    width:350px;
+    background:white;
+	border-radius:3px;
+    height:485px;
+	top:75px;
+    z-index:10;
+	box-shadow: 0px 1px 15px 3px #222222;
+}
+#overlay-back {
+    position   : absolute;
+    top        : 0;
+    left       : 0;
+    width      : 100%;
+    height     : 100%;
+    background : #000;
+    opacity    : 0.6;
+    filter     : alpha(opacity=60);
+    z-index    : 5;
+    display    : none;
+}
+
+#overlay {
+    position : absolute;
+    top      : 0;
+    left     : 0;
+    width    : 100%;
+    height   : 100%;
+    z-index  : 10;
+    display  : none;
+} 
+
+#top{
+	padding:0;
+	margin:0;
+	width:100%;
+	height:175px;
+	border-radius:3px 3px 0px 0px;
+	background:lightgrey;
+}
+
+#bottom{
+	padding:15px 15px 20px 15px;
+	margin:0;
+	width:100%;
+	height:310px;
+	color:black;
+
+}
+
+.info{
+	padding-top:5px;
+}
+
+
+
+#bottom input{
+	width:100%;
+	border:1px solid lightgrey;
+	border-radius:5px;
+	padding:0 10px 0 10px;
+}
+
+#username, #password, #email, #verifyCode, #newPassword, #code{
+	height:35px;
+	box-shadow: 0px 0px 1px 1px #eeeeee inset;
+}
+
+#signInBtn{
+	height:40px;
+	margin-top:15px;
+	background:#446fb5;
+	color:white;
+	font-weight:bold;
+}
+
+#signInBtn:hover{
+	background:#345589;
+	cursor:pointer;
+}
+
+#signUpBtn, #confirmAccount, #forgotPasswordBtn, #changePasswordBtn{
+	height:40px;
+	margin-top:30px;
+	background:#446fb5;
+	color:white;
+	font-weight:bold;
+}
+
+#signUpBtn:hover, #confirmAccount:hover, #forgotPasswordBtn:hover, #changePasswordBtn:hover{
+	background:#345589;
+	cursor:pointer;
+}
+
+#topInfo{
+	padding-bottom:5px;
+	font-size:17px;
+}
+
+.topInfo{
+	padding-bottom:5px;
+	font-size:17px;
+}
+
+#forgot{
+	padding-top:0;
+	font-size:14px;
+}
+
+#refSignUp, #refSignIn{
+	margin-top:15px;
+	text-align:center;
+}
+
+/* top 22px is relative to overall height 500px and top height 35%. If these change so does top */
+#top img{
+	display:block;
+	margin:auto;
+	width:50%;
+	height:75%;
+	position:relative;
+	top:22px;
+}
+
+.err{
+	border:2px solid #fc5050;
+	color:#fc5050;
+	background:#eeeeee;
+	padding-left:5px;
+	margin-top:10px;
+}

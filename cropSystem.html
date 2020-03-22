@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<!-- best to download these files onto server instead of having to make http requests each call -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.2.1/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.2.1/cropper.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  
+
+
+<!-- stylesheet specific for cropSystem -->
+<link rel="stylesheet" href="stylesheets/cropSystem.css">
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+
+</head>
+<body style="padding-top:50px;">
+
+<div class="cropSystem row">
+
+	<div class="col-2"></div>
+	
+	<div class="col-6 d-flex flex-column imgDisplay">
+		<div class="top d-flex flex-row justify-content-end">
+			<h3 class="mr-auto">Image Display</h3>
+			<button id="deleteImgBtn" type="button" class="btn btn-outline-success">Delete Image</button>
+		</div>
+		
+		<div class="middle d-flex justify-content-center">
+			<img id="img1" src="#" class="postImg hidden">
+		</div>
+		
+		<div class="bottom d-flex flex-row justify-content-end">
+		</div>
+	</div>
+	
+	<div class="col-2 d-flex flex-column images">
+		<div class="top d-flex justify-content-center">
+			<button id="upload-photo-label" type="button" class="btn btn-outline-success">Upload Image</button>
+			<input type="file" name="photo" id="upload-photo" />	
+		</div>
+		
+		<div id="imgList" class="middle d-flex flex-column">
+
+		</div>
+		
+		<div class="bottom">
+		
+		</div>
+	</div>	
+	
+	<div class="col-2"></div>
+
+
+</div>
+
+<script src="js/internal-cropSystem.js"></script>
+
+</body>
+</html>

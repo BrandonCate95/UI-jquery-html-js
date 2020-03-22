@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Bootstrap datepicker example</title>
+  
+  
+<!-- best to download these files onto server instead of having to make http requests each call -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.2.1/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.2.1/cropper.min.js"></script>  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  
+  
+<style>
+body {
+  padding-top: 54px;
+}
+
+@media (min-width: 992px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+.portfolio-item {
+  margin-bottom: 30px;
+}
+
+.pagination {
+  margin-bottom: 30px;
+}
+
+img {
+	max-width:700px;
+	height:auto;
+}
+
+.card:hover{
+	cursor:pointer;
+	box-shadow:0 0 10px 1px #eeeeee;
+}
+
+.wrapper{
+	margin:0 10%;
+}
+.card{
+	border:none;
+}
+.card-body{
+	padding:5px 0px;
+}
+.card-title{
+	font-size:17px;
+	font-weight:bold;
+	margin:0;
+}
+.card-text{
+	font-size:14px;
+}
+.card-location{
+	display:inline;
+
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#7397d1;
+}
+.card-date{
+	display:inline;
+
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#7397d1;
+}
+.card-divider{
+	display:inline;
+	height:5px;
+	padding:0;
+	margin:0;
+	color:#7397d1;
+}
+.card-info{
+	padding-top:2px;
+	padding-bottom:2px;
+}
+.imgDisplay{
+	height:420px;
+	padding:0;
+	background:#565656;
+}
+.images{
+	padding:0;
+	background:#565656;
+}
+.top,.bottom{
+	height:60px;
+	background:white;
+	border-top:1px solid lightgrey;
+	border-bottom:1px solid lightgrey;
+}
+.top{
+	box-shadow:0 4px 2px -2px black;
+}
+.middle{
+	height:300px;
+}
+.images .middle{
+	box-shadow:0 0 50px 1px #9a9a9a inset, 0 0 1px 1px black inset;
+}
+label {
+   cursor: pointer;
+}
+
+#upload-photo {
+   opacity: 0;
+   position: absolute;
+   z-index: -1;
+}
+#imgList{
+	padding:20px;
+	overflow:auto;
+}
+.imgListItem{
+	width:100px;
+	height:100px;
+	margin:5px auto;
+}
+.activeImg{
+	border:2px solid white;
+}
+.btn{
+	border-radius:5px;
+	height:40px;
+}
+#img1{
+	height:100%;
+	max-width:100%;
+	width:auto;
+	box-shadow:none;
+}
+.imageDisplay img{
+	box-shadow:2px 2px 15px 1px black;
+}
+
+.btn-outline-success, .btn-outline-success:visited{
+	margin:auto 4% auto 0;
+	color:#439cdb !important;
+	border-color:#439cdb !important;
+}
+.input-group .btn-outline-success{
+	margin:auto 0 auto 0;
+	border-radius:0;
+	background:white !important;
+	border-color:#439cdb !important;
+}
+
+.btn-outline-success:hover, .btn-outline-success:active{
+	cursor:pointer;
+	color:white !important;
+    background-color:#439cdb !important;
+}
+#deleteImgBtn, #deleteImgBtn:visited{
+	color:red !important;
+	border-color:red !important;
+	outline:none;
+}
+.btn:focus,.btn:active {
+   outline: none !important;
+   box-shadow: none;
+}
+
+#deleteImgBtn:hover, #deleteImgBtn:active{
+	color:white !important;
+    background-color: red !important;
+}
+.hidden{
+	display:none;
+}
+h3{
+	margin:auto 0;
+}
+.row{
+	margin:30px 0;
+}
+.searchForm, .searchPost{
+	padding:0;
+}
+.searchForm{
+	padding-right:4%;
+}
+.fa-question-circle-o{
+	font-size:18px;
+	cursor:pointer;
+	color:#439cdb;
+}
+.card{
+	max-width:250px;
+	height:auto;
+}
+
+.input-addon-start, .input-addon-end{
+	width:50px !important;
+	margin:0 !important;
+}
+.input-addon-end{
+	border-radius:0;
+}
+.calendar{
+	padding:0 !important;
+	border:none;
+}
+.input-addon-title{
+	width:105px !important;
+}
+.input-button{
+	border-radius:0;
+	height:100%;
+}
+.form-control{
+	background:white !important;
+}
+.input-button{
+	cursor:pointer;
+}
+.fa-calendar{
+	color:#439cdb;
+}
+.btn-group{
+	width:100% !important;
+}
+.btn-group .btn-outline-success{
+	margin:auto 0 !important;
+	padding:auto !important;
+	width: 50%;
+}
+.active{
+	background:#439cdb !important;
+	color:white !important;
+}
+.focus,.active{
+	box-shadow:none !important;
+	outline:none !important;
+}
+.input-addon-start{
+	border-radius:0px !important;
+}
+.hiddenForm{
+    height: 0;
+    overflow: hidden;
+}
+.animateShowForm{
+    height: 0;
+    overflow: hidden;
+   -moz-animation: slideForward 0.5s ease 0s forwards;
+   -webkit-animation: slideForward 0.5s ease 0s forwards;
+   -o-animation: slideForward 0.5s ease 0s forwards;
+   -ms-animation: slideForward 0.5s ease 0s forwards;
+    animation: slideForward 0.5s ease 0s forwards;
+}
+
+
+@-moz-keyframes slideForward /* Firefox */
+{
+from {height: 0;}
+to {height: 35.4px;}
+}
+
+@-webkit-keyframes slideForward /* Safari and Chrome */
+{
+from {height: 0;}
+to {height: 35.4px;}
+}
+
+@-ms-keyframes slideForward /* IE10 */
+{
+from {height: 0;}
+to {height: 35.4px;}
+}
+
+@keyframes slideForward
+{
+from {height: 0;}
+to {height: 35.4px;}
+}
+
+.animateHideForm{
+    height: 0px;
+    overflow: hidden;
+   -moz-animation: slideBackward 0.5s ease 0s backwards;
+   -webkit-animation: slideBackward 0.5s ease 0s backwards;
+   -o-animation: slideBackward 0.5s ease 0s backwards;
+   -ms-animation: slideBackward 0.5s ease 0s backwards;
+    animation: slideBackward 0.5s ease 0s backwards;
+}
+
+
+@-moz-keyframes slideBackward /* Firefox */
+{
+from {height: 35.4px;}
+to {height: 0;}
+}
+
+@-webkit-keyframes slideBackward /* Safari and Chrome */
+{
+from {height: 35.4px;}
+to {height: 0;}
+}
+
+@-ms-keyframes slideBackward /* IE10 */
+{
+from {height: 35.4px;}
+to {height: 0;}
+}
+
+@keyframes slideBackward
+{
+from {height: 35.4px;}
+to {height: 0;}
+}
+.animateEventShowForm{
+    height: 0;
+    overflow: hidden;
+   -moz-animation: slideEventForward 0.5s ease 0s forwards;
+   -webkit-animation: slideEventForward 0.5s ease 0s forwards;
+   -o-animation: slideEventForward 0.5s ease 0s forwards;
+   -ms-animation: slideEventForward 0.5s ease 0s forwards;
+    animation: slideEventForward 0.5s ease 0s forwards;
+}
+
+
+@-moz-keyframes slideEventForward /* Firefox */
+{
+from {height: 0;}
+to {height: 247.8px;}
+}
+
+@-webkit-keyframes slideEventForward /* Safari and Chrome */
+{
+from {height: 0;}
+to {height: 247.8px;}
+}
+
+@-ms-keyframes slideEventForward /* IE10 */
+{
+from {height: 0;}
+to {height: 247.8px;}
+}
+
+@keyframes slideEventForward
+{
+from {height: 0;}
+to {height: 247.8px;}
+}
+
+.animateEventHideForm{
+    height: 0px;
+    overflow: hidden;
+   -moz-animation: slideEventBackward 0.5s ease 0s backwards;
+   -webkit-animation: slideEventBackward 0.5s ease 0s backwards;
+   -o-animation: slideEventBackward 0.5s ease 0s backwards;
+   -ms-animation: slideEventBackward 0.5s ease 0s backwards;
+    animation: slideEventBackward 0.5s ease 0s backwards;
+}
+
+
+@-moz-keyframes slideEventBackward /* Firefox */
+{
+from {height: 247.8px;}
+to {height: 0;}
+}
+
+@-webkit-keyframes slideEventBackward /* Safari and Chrome */
+{
+from {height: 247.8px;}
+to {height: 0;}
+}
+
+@-ms-keyframes slideEventBackward /* IE10 */
+{
+from {height: 247.8px;}
+to {height: 0;}
+}
+
+@keyframes slideEventBackward
+{
+from {height: 247.8px;}
+to {height: 0;}
+}
+</style>  
+  
+  
+  
+</head>
+
+
+<body>
+
+
+<input class="calendar" placeholder="calendar 1">
+<input class="calendar" placeholder="calendar 2">
+<input class="calendar" placeholder="calendar 3">
+
+
+		<div class="btn-group d-flex flex-row" data-toggle="buttons">
+  <label class="btn btn-outline-success active d-flex justify-content-center">
+    <input type="radio" name="options" class="radioBtn" id="option1" autocomplete="off" checked> 
+	<span class="align-self-center">Business</span>
+  </label>
+<span class="input-group-addon input-addon-title justify-content-center">Or</span>
+  <label class="btn btn-outline-success d-flex justify-content-center align-self-center">
+    <input type="radio" name="options" class="radioBtn" id="option2" autocomplete="off">
+	<span class="align-self-center">Event</span>
+  </label>
+<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+</div>
+		
+		
+	<div id="businessDateForm" class="">
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Business</span>
+			<div id="eventStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="eventEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+	</div>
+	
+	<div id="eventDateForm" class="hiddenForm">
+		
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Monday</span>
+			<div id="mondayStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="mondayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Tuesday</span>
+			<div id="tuesdayStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="tuesdayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>	
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Wednesday</span>
+			<div id="wednesdayStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="wednesdayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>	
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Thursday</span>
+			<div id="thursdayStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="thursdayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>	
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Friday</span>
+			<div id="fridayStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="fridayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>	
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Saturday</span>
+			<div id="saturdayStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="saturdayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>	
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Sunday</span>
+			<div id="sundayStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="sundayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>			
+		
+		
+	</div>
+
+<script>
+$(function() {
+	$(document).on("change", ".radioBtn", function(){
+
+	console.log(this);
+
+	if(this.id == "option1"){
+		document.getElementById("eventDateForm").className = "animateEventHideForm";
+		setTimeout(function(){ document.getElementById("businessDateForm").className = "animateShowForm"; }, 500);
+	
+	}else if(this.id == "option2"){
+		document.getElementById("businessDateForm").className = "animateHideForm";
+		setTimeout(function(){ document.getElementById("eventDateForm").className = "animateEventShowForm"; }, 500);
+		
+	}
+	
+	});
+});
+
+flatpickr('.calendar',{
+    enableTime: true
+});
+
+$(function() {
+	$(document).on("change", ".calendar", function(){
+	
+		getDate(this.value);
+	
+	});
+});
+
+function getDate(date){
+
+	var data = date.split(/[: -]+/);
+
+	console.log(data);
+	return data;
+}
+
+$(function() {
+	$(document).on("change", ".calendar", function(){
+	
+		console.log(this.value);
+	
+	});
+});
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.2.1/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.2.1/cropper.min.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<style>
+div{
+	width:400px;
+	border:1px solid grey;
+}
+img{
+	max-width:100%;
+}
+</style>
+</head>
+<body style="padding-top:50px;">
+
+<div>
+	<img id="img1" class="card-img-top" src="https://s3-us-west-1.amazonaws.com/ttd-service-image-storage/test/hiking1.2.jpg" alt="">
+</div>
+<div class="btn-group btn-group-crop">
+<button id="cropBtn" type="button" class="btn btn-success" data-method="getCroppedCanvas" data-option="{ &quot;maxWidth&quot;: 4096, &quot;maxHeight&quot;: 4096 }">
+    <span class="docs-tooltip" data-toggle="tooltip" title="cropper.getCroppedCanvas({ maxWidth: 4096, maxHeight: 4096 })">
+        Get Cropped Canvas
+    </span>
+</button>
+</div>
+
+<div id="imgs">
+	<img id="image1" src="#">
+</div>
+<script>
+var image = document.getElementById("img1");
+var cropper = new Cropper(image, {
+  aspectRatio: 16 / 9,
+  crop: function(e) {
+    console.log(e.detail.x);
+    console.log(e.detail.y);
+    console.log(e.detail.width);
+    console.log(e.detail.height);
+    console.log(e.detail.rotate);
+    console.log(e.detail.scaleX);
+    console.log(e.detail.scaleY);
+  }
+});
+
+$(function() {
+	$(document).on("click", "#cropBtn", function(){
+cropper.getCroppedCanvas();
+
+cropper.getCroppedCanvas({
+  width: 160,
+  height: 90,
+  minWidth: 256,
+  minHeight: 256,
+  maxWidth: 4096,
+  maxHeight: 4096,
+  fillColor: '#fff',
+  imageSmoothingEnabled: false,
+  imageSmoothingQuality: 'high',
+});
+console.log(cropper.getCroppedCanvas().toDataURL());
+document.getElementById("image1").src = cropper.getCroppedCanvas().toDataURL();
+
+	});
+});
+</script>
+
+</body>
+</html>

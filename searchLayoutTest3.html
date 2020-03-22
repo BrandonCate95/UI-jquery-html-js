@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.154.0.min.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<style>
+body {
+  padding-top: 54px;
+}
+
+@media (min-width: 992px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+.portfolio-item {
+  margin-bottom: 30px;
+}
+
+.pagination {
+  margin-bottom: 30px;
+}
+
+img {
+	max-width:700px;
+	height:auto;
+}
+
+.card:hover{
+	cursor:pointer;
+	box-shadow:0 0 10px 1px #eeeeee;
+}
+
+.wrapper{
+	margin:0 10%;
+}
+.card{
+	border:none;
+}
+.card-body{
+	padding:5px 0px;
+}
+.card-title{
+	font-size:17px;
+	font-weight:bold;
+	margin:0;
+}
+.card-text{
+	font-size:14px;
+}
+.card-location{
+	display:inline;
+
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#7397d1;
+}
+.card-date{
+	display:inline;
+
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#7397d1;
+}
+.card-divider{
+	display:inline;
+	height:5px;
+	padding:0;
+	margin:0;
+	color:#7397d1;
+}
+.card-info{
+	padding-top:2px;
+	padding-bottom:2px;
+}
+.card{
+	max-width:250px;
+	height:auto;
+}
+</style>
+
+
+<script>
+AWS.config.update({
+  region: 'us-west-1',
+  accessKeyId: 'AKIAJZH5MFCWDXTY7HHA',
+  secretAccessKey: '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'
+});
+
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+function getURLParams() {
+
+	var urlParams;
+
+    var match,
+       pl     = /\+/g,  // Regex for replacing addition symbol with a space
+       search = /([^&=]+)=?([^&]*)/g,
+       decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+       query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query)){
+       urlParams[decode(match[1])] = decode(match[2]);
+	}
+	return urlParams;
+}
+
+//function loadPage(pg,onPageInput){
+
+//	var table = "ttdTest3";
+//    var title = pg;
+
+//    var params = {
+//        TableName: table,
+//        Key:{
+//            "title": title
+//        }
+//    };
+//    docClient.get(params, function(err, data) {
+//        if (err) {
+//			console.log(err);
+//        } else {
+//			createPage(data.Item,onPageInput);
+//        }
+//    });
+//}
+
+function processAjaxData(searchData, onPageInput){
+	
+	var url = "http://localhost/UI/searchLayoutTest3.html";
+	//setting all parameters
+	if(params.q){
+		var search = params.q;
+		params.q = "";//set to null or messes shit up
+		
+	}else{
+		var search = document.getElementById("searchText").value;
+	}
+	
+	if(search){
+		var url = url + "?q=" + search;
+		console.log(url);
+	}	
+	
+	if(onPageInput){//search or page click on website, need to pushstack to create new history
+		window.history.pushState({"search":search,"searchData":searchData,"pageTitle":"","pageData":""},"", url);
+	}else{
+		window.history.replaceState({"search":search,"searchData":searchData,"pageTitle":"","pageData":""},"", url);
+	}
+	
+}
+
+window.onpopstate = function(e){
+	
+    if(e.state){
+		console.log("getting state data");
+		
+		if(e.state.search){
+			document.getElementById("searchText").value = e.state.search;
+		}else{
+			document.getElementById("searchText").value = "";
+		}
+		if(e.state.searchData){
+			document.getElementById("searchResults").innerHTML = "";
+			formatData(e.state.searchData);
+		}else{
+			document.getElementById("searchResults").innerHTML = "";
+		}
+		if(e.state.pageTitle){
+			document.getElementById("pageText").value = e.state.pageTitle;
+		}else{
+			//document.getElementById("pageText").value = "";		
+		}
+		if(e.state.pageData){//have to check if page is up or not as well
+			if(document.getElementById('wrapper')){
+				document.getElementById("wrapper").innerHTML = e.state.pageData;
+			}else{
+				var div = document.createElement("div");
+				div.id = "wrapper";
+				div.className = "wrapper";
+	
+				div.append(e.state.pageData);
+	
+				$('body').append(div);
+			}
+		}else if(document.getElementById('wrapper')){
+			$('#wrapper').remove();
+		}
+    }
+};
+
+$(function() {
+	$(document).on("click", "#Search", function(){
+	
+	var query = document.getElementById("searchText").value;
+	searchReq(query,true);
+	
+	});
+});
+
+function searchReq(query,onPageInput){
+	//clear search results
+	document.getElementById("searchResults").innerHTML = "";
+	
+	var http = new XMLHttpRequest();
+		
+	var userSearchDomain = "search-ttd-domain-test4-dyydkif3glfylufhmtvfcfmhfe.us-west-1.cloudsearch.amazonaws.com/2013-01-01/";
+		
+	var formData = new FormData();
+	formData.append("URL", userSearchDomain + "search?q=" + query + "&return=title,location,place,date,price,img_path");
+		
+	http.open("POST", "/ttdTestServer/info.php", true);
+	http.send(formData);
+
+	http.onreadystatechange = function() {//Call a function when the state changes.
+		if(http.readyState == 4 && http.status == 200) {
+			var JSONString = http.responseText;
+			var JSONObject = JSON.parse(JSON.parse(JSONString)); //There are two parses here as the first strips outer quotes and forward slashes while the second converts now readable JSON string into JSON object
+				
+			if(document.getElementById("textarea")){ //added for debugging purposes on addItem page
+				document.getElementById("textarea").innerHTML = JSON.stringify(JSONObject["hits"]["hit"]);
+			}
+			//console.log(JSONObject["hits"]["hit"])
+			formatData(JSONObject["hits"]["hit"]);
+			processAjaxData(JSONObject["hits"]["hit"],onPageInput);
+		}
+	}
+}
+
+function formatData(data){
+
+	for(var k in data){
+
+	console.log(data[k]["fields"].location);
+	
+	var title = data[k]["fields"].title;
+	var location = data[k]["fields"].place;
+	var price = data[k]["fields"].price;
+	var img_path = data[k]["fields"].img_path;
+	var date = data[k]["fields"].date;
+	
+	//console.log(img_path);
+	
+	
+    //<div class="col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item">
+      //<div class="card h-100">
+        //<div class="imgContainer"><img class="card-img-top" src="https://s3-us-west-1.amazonaws.com/ttd-service-image-storage/test/bakeCake1.2.jpg" alt=""></div>
+		//<div class="card-body">
+		  //<div class="card-text-top">
+			//<p class="card-info card-location">CA, Camarillo</p>
+			//<div class="card-divider">&#8729;</div>
+			//<p class="card-info card-date">Feb, 18</p>
+		  //</div>
+          //<h4 class="card-info card-title">Bake with a professional chef</h4>
+          //<p class="card-info card-text">$30 per person</p>
+        //</div>
+      //</div>
+    //</div>
+		
+	var col = document.createElement("div");
+	col.className = "col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item";
+	
+	var card = document.createElement("div");
+	card.className = "card h-100";
+	
+	var imgCon = document.createElement("div");
+	imgCon.className = "imgContainer";
+	
+	var img = document.createElement("img");
+	img.id = "image1";
+	img.className = "card-img-top";
+	img.src = img_path;
+	
+	var cardBd = document.createElement("div");
+	cardBd.className = "card-body";
+	
+	var cardTxTop = document.createElement("div");
+	cardTxTop.className = "card-text-top";
+	
+	var locEl = document.createElement("p");
+	locEl.className = "card-info card-location";
+	locEl.innerHTML = location;
+	
+	var cardDivider = document.createElement("div");
+	cardDivider.className = "card-divider";
+	cardDivider.innerHTML = "&#8729;"
+	
+	var cardDate = document.createElement("p");
+	cardDate.className = "card-info card-date";
+	cardDate.innerHTML = date;
+	
+	var cardTitle = document.createElement("h4");
+	cardTitle.className = "card-info card-title";
+	cardTitle.innerHTML = title;
+	
+	var cardPrice = document.createElement("p");
+	cardPrice.className = "card-info card-text";
+	
+	var usdIcon = document.createElement("i");
+	usdIcon.className = "fa fa-usd";
+	
+	cardPrice.append(usdIcon);
+	cardPrice.append(price + " per person");
+	
+	cardTxTop.append(locEl);
+	cardTxTop.append(cardDivider);
+	cardTxTop.append(cardDate);
+	
+	cardBd.append(cardTxTop);
+	cardBd.append(cardTitle);
+	cardBd.append(cardPrice);
+	
+	imgCon.append(img);
+	
+	card.append(imgCon);
+	card.append(cardBd);
+	
+	col.append(card);
+	
+	$('#searchResults').append(col);
+	
+	}
+}
+</script>
+
+
+</head>
+<body>
+
+<input type="text" id="searchText" placeholder="query...">
+<input type="submit" id="Search" value="Search">
+
+<div class='wrapper'>
+
+    <div id="searchResults" class="row">
+	</div>
+	
+</div>
+
+<script>
+
+//script runs whenever user enters in URL
+params = getURLParams();
+
+if(params.q){//run search load script
+	searchReq(params.q,false);
+}else{//either a refresh or connect to homepage
+	processAjaxData(false);
+}
+</script>
+
+
+</body>
+</html>

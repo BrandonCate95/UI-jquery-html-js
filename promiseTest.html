@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script language="javascript">
+
+$(function() {
+	$(document).on("click", "#stuff", function(){
+		var someVariable = "text";
+		function1(someVariable).then(function() {
+			//this function is executed after function1
+			var someOtherVariable = "function 2 execute";
+			function2(someOtherVariable);
+		});
+	});
+});
+
+
+function function1(param, callback) {
+    return new Promise(function (fulfill, reject){
+        //do stuff
+		var http = new XMLHttpRequest();
+		console.log("run1");
+		var keyword = "Hello";
+		
+		var formData = new FormData();
+		formData.append("keywords", keyword);
+		
+		http.open("POST", "http://localhost/googleads-php-lib/examples/AdWords/v201710/Optimization/GetKeywordIdeas.php", false);
+		http.send(formData);
+
+		http.onreadystatechange = function() {//Call a function when the state changes.
+			if(http.readyState == 4 && http.status == 200) {
+				console.log("state change 1");
+				var JSONString = http.responseText;
+				var JSONObject = JSON.parse(JSON.parse(JSONString)); //There are two parses here as the first strips outer quotes and forward slashes while the second converts now readable JSON string into JSON object
+				//document.getElementById("textarea").innerHTML = JSONString;
+				//document.getElementById("textarea").innerHTML = JSONObject;
+				console.log(JSONObject);
+			}
+		}
+		
+        fulfill(console.log("Success bitch!!")); //if the action succeeded
+        reject(error); //if the action did not succeed
+    });
+}
+
+function function2(someOtherVariable){
+	console.log(someOtherVariable);
+}
+
+</script>
+</head>
+<body>
+
+<input type="button" id="stuff" value="Click" >
+
+</body>
+
+</html>

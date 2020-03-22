@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<!-- This is a note for me later down the line. If we find that many people are not signing up, integrate an external identity provider like facebook, but at least
+for start only use our own identity provider. This is b/c if we use external provider they will take all data from website, which could be worth a lot -->
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.154.0.min.js"></script>
+<!-- important MUST INCLUDED these files by direct download -->
+
+<script src="aws-cognito-sdk.min.js"></script>
+<script src="amazon-cognito-identity.min.js"></script>
+
+<script language="javascript">
+
+function currentUserAccess(){
+	AWSCognito.config.region = 'us-east-2'; //This is required to derive the endpoint
+
+	var poolData = { UserPoolId : 'us-east-2_ZX9XT03Iz',
+		ClientId : '48o24i7hd9stp18lh24hc3tdfb'
+	};
+	var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+	var cognitoUser = userPool.getCurrentUser();
+	if (cognitoUser != null) {
+		cognitoUser.getSession(function(err, result) {
+			if (err) {
+				alert(err);
+				return;
+			}
+			accessAWS(result);
+		});
+	}
+}
+//onload run to check if user is already signed in
+currentUserAccess();
+
+
+//user sign up    
+$(function() {
+	$(document).on("click", "#SignUp", function(){	
+	
+	//get Form data
+	//username global variable for calling purposes
+	username = document.getElementById("usernameSignUp").value;
+	var password = document.getElementById("passwordSignUp").value;
+	var email = document.getElementById("email").value;
+	var phone = document.getElementById("phoneNumber").value;
+	
+	AWSCognito.config.region = 'us-east-2'; //This is required to derive the endpoint
+        
+		
+	//when configuring user pool unless you create domain, you cannot use a link verification only code verfication	
+    var poolData = { UserPoolId : 'us-east-2_ZX9XT03Iz',
+        ClientId : '48o24i7hd9stp18lh24hc3tdfb'
+    };
+
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+
+    var attributeList = [];
+    
+    var dataEmail = {
+        Name : 'email',
+        Value : email
+    };
+    var dataPhoneNumber = {
+        Name : 'phone_number',
+        Value : '+15555555555'
+    };
+    var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
+    var attributePhoneNumber = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataPhoneNumber);
+
+    attributeList.push(attributeEmail);
+    attributeList.push(attributePhoneNumber);
+
+	//sign up new user with info
+    userPool.signUp(username, password, attributeList, null, function(err, result){
+        if (err) {
+            alert(err);
+			console.log(typeof err);
+			console.log(err);
+            return;
+        }
+        cognitoUser = result.user;
+        console.log('user name is ' + cognitoUser.getUsername());
+		
+    });
+	//call function to authenticate user code
+		createAuthenticateCode();
+	});
+	
+});
+
+function createAuthenticateCode(){
+	var code = document.createElement("input");
+	code.type = "text";
+	code.id = "code";
+	code.placeholder = "Enter registration code...";
+	
+	var codeSubmit = document.createElement("input");
+	codeSubmit.type = "submit";
+	codeSubmit.id = "codeSubmit";
+	codeSubmit.value = "Submit";
+	
+	var confirmDiv = document.getElementById("confirm");
+	
+	confirmDiv.append(code);
+	confirmDiv.append(codeSubmit);
+}
+
+//when user clicks on newly create codesubmit element calls this function
+$(function() {
+	$(document).on("click", "#codeSubmit", function(){	
+	
+		//get confirmation code
+		var confirmationCode = document.getElementById("code").value;
+		
+		console.log(typeof confirmationCode);
+		console.log(confirmationCode);
+		console.log(username);
+	
+		AWSCognito.config.region = "us-east-2"; //This is required to derive the endpoint
+	
+		var poolData = {
+			UserPoolId : "us-east-2_ZX9XT03Iz",
+			ClientId : "48o24i7hd9stp18lh24hc3tdfb"
+		};
+
+		var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+		var userData = {
+			Username : username,
+			Pool : userPool
+		};
+
+		var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+		cognitoUser.confirmRegistration(confirmationCode, true, function(err, result) {
+			if (err) {
+				alert(err);
+				return;
+			}
+			console.log("call result: " + result);
+		});
+	
+	});
+	
+});
+
+
+//user sign in
+$(function() {
+	$(document).on("click", "#SignIn", function(){	
+	
+	//username global variable for calling purposes
+	username = document.getElementById("usernameSignIn").value;
+	var password = document.getElementById("passwordSignIn").value;
+	
+	AWSCognito.config.region = 'us-east-2'; //This is required to derive the endpoint
+        
+		
+	//when configuring user pool unless you create domain, you cannot use a link verification only code verfication	
+    var poolData = { UserPoolId : 'us-east-2_ZX9XT03Iz',
+        ClientId : '48o24i7hd9stp18lh24hc3tdfb'
+    };
+
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+	var userData = {
+		Username : username, // your username here
+		Pool : userPool
+	};
+	
+    var authenticationData = {
+        Username : username, // your username here
+        Password : password, // your password here
+    };
+    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+ 
+    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: function (result) {
+            console.log('access token + ' + result.getAccessToken().getJwtToken());
+			
+			accessAWS(result);
+			
+        },
+ 
+        onFailure: function(err) {
+            alert(err);
+			console.log(typeof err);
+			console.log(err.name);
+        },
+        mfaRequired: function(codeDeliveryDetails) {
+            var verificationCode = prompt('Please input verification code' ,'');
+            cognitoUser.sendMFACode(verificationCode, this);
+        }
+    });
+
+	});
+	
+});
+
+//authenticate user through identity pool to get access to AWS resources
+function accessAWS(result){
+	AWS.config.region = 'us-east-2';
+	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+		IdentityPoolId: 'us-east-2:33b51ce1-f0fd-4e76-bd9d-ff782327bf2d',
+		Logins: {
+			'cognito-idp.us-east-2.amazonaws.com/us-east-2_ZX9XT03Iz': 
+			result.getIdToken().getJwtToken()
+		}
+	});
+			
+	AWS.config.credentials.get(function(err){
+		if (err) {
+			alert(err);
+		}
+		//call function to use AWS resources
+		console.log("Successful AWS access");
+		
+	});
+}
+
+
+
+//user sign out
+$(function() {
+	$(document).on("click", "#SignOut", function(){	
+	
+		AWSCognito.config.region = 'us-east-2'; //This is required to derive the endpoint
+
+		var data = { UserPoolId : 'us-east-2_ZX9XT03Iz',
+			ClientId : '48o24i7hd9stp18lh24hc3tdfb'
+		};
+		var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+		var cognitoUser = userPool.getCurrentUser();
+		
+		if (cognitoUser != null) {
+          cognitoUser.signOut();
+        }
+
+	});
+	
+});
+
+$(function() {
+	$(document).on("click", "#forgotPassword", function(){	
+	
+		username = document.getElementById("usernameSignIn").value;
+	
+		AWSCognito.config.region = "us-east-2"; //This is required to derive the endpoint
+	
+		var poolData = {
+			UserPoolId : "us-east-2_ZX9XT03Iz",
+			ClientId : "48o24i7hd9stp18lh24hc3tdfb"
+		};
+
+		var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+		var userData = {
+			Username : username,
+			Pool : userPool
+		};
+
+		var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+		cognitoUser.forgotPassword({
+			onSuccess: function (result) {
+				console.log(result);
+				console.log(this);
+			},
+			onFailure: function(err) {
+				alert(err);
+			}//,
+			//inputVerificationCode() {
+			//	var verificationCode = prompt('Please input verification code ' ,'');
+			//	var newPassword = prompt('Enter new password ' ,'');
+			//	cognitoUser.confirmPassword(verificationCode, newPassword, this);
+			//}
+		});
+	});
+	
+});
+
+$(function() {
+	$(document).on("click", "#confirmNewPassword", function(){	
+	
+		console.log("called new password");
+	
+		username = document.getElementById("usernameSignIn").value;
+		verificationCode = document.getElementById("code").value;
+		newPassword = document.getElementById("newPassword").value;
+	
+		AWSCognito.config.region = "us-east-2"; //This is required to derive the endpoint
+	
+		var poolData = {
+			UserPoolId : "us-east-2_ZX9XT03Iz",
+			ClientId : "48o24i7hd9stp18lh24hc3tdfb"
+		};
+
+		var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+		var userData = {
+			Username : username,
+			Pool : userPool
+		};
+
+		var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+		cognitoUser.confirmPassword(verificationCode, newPassword, {
+            onFailure(err) {
+                console.log(err);
+            },
+            onSuccess() {
+                console.log("success");
+            }
+		});
+	});
+	
+});
+
+</script>
+</head>
+<body>
+
+Register:
+<br>
+<input type="text" id="usernameSignUp" placeholder="Username...">
+<br>
+<input type="text" id="passwordSignUp" placeholder="Password...">
+<br>
+<input type="text" id="email" placeholder="email...">
+<br>
+<input type="text" id="phoneNumber" placeholder="Phone number...">
+<br>
+<input type="submit" id="SignUp" value="Sign Up">
+<br>
+<div id="confirm"></div>
+Sign In:
+<br>
+<input type="text" id="usernameSignIn" placeholder="Username...">
+<br>
+<input type="text" id="passwordSignIn" placeholder="Password...">
+<br>
+<input type="submit" id="SignIn" value="Sign In">
+<br>
+<div id="forgotPassword">Forgot Password?</div>
+<br>
+<input type="text" id="code" placeholder="Code...">
+<br>
+<input type="text" id="newPassword" placeholder="New password...">
+<br>
+<input type="submit" id="confirmNewPassword" value="Confirm New password">
+<br>
+<br>
+<input type="submit" id="SignOut" value="Sign Out">
+
+</body>
+
+</html>

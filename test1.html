@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script language="javascript">
+function add_form()
+{
+	var form = document.createElement("form");
+	var form.id = "form1";
+	
+	var input = document.createElement("input");
+	input.type = "text";
+	
+	form.append(input);
+	
+	document.getElementById("addedForm").append(form);
+	
+	
+}
+</script>
+</head>
+<body>
+
+<h1>Base Webpage</h1>
+
+<form id="addPost">
+	<input type="button" value="Add ttd post" style="font-weight:bold;" onclick="add_form()">
+</form>
+
+<div id="addedForm">
+
+</div>
+
+</body>
+
+</html>

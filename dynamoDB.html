@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.154.0.min.js"></script>
+
+<script>
+AWS.config.update({
+  region: 'us-west-1',
+  accessKeyId: 'AKIAJZH5MFCWDXTY7HHA',
+  secretAccessKey: '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'
+});
+
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+function readItem() {
+    var table = "ttdTest3";
+    var title = "Ski";
+
+    var params = {
+        TableName: table,
+        Key:{
+            "title": title
+        }
+    };
+    docClient.get(params, function(err, data) {
+        if (err) {
+            document.getElementById('textarea').innerHTML = "Unable to read item: " + "\n" + JSON.stringify(err, undefined, 2);
+        } else {
+			console.log(data.Item.title);
+            document.getElementById('textarea').innerHTML = "GetItem succeeded: " + "\n" + JSON.stringify(data, undefined, 2);
+			createPage(data.Item);
+        }
+    });
+}
+
+function createPage(data){
+	var div = document.createElement("div");
+	div.id = "wrapper";
+	div.className = "wrapper";
+	
+	var br = document.createElement("br");
+	
+	div.append(data.title);
+	div.append(br);
+	div.append(data.description);
+	
+	$('body').append(div);
+}
+
+
+</script>
+
+<style>
+.wrapper{
+	position:absolute;
+	top:50px;
+	left:500px;
+	background:lightgrey;
+	width:200px;
+	height:200px;
+}
+</style>
+
+</head>
+<body>
+
+<input id="readItem" type="button" value="Read Item" onclick="readItem();" />
+<br><br>
+<textarea readonly id= "textarea" style="width:400px; height:800px"></textarea>
+
+</body>
+<html>

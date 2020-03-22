@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.3.0.min.js"></script>
+<script>
+AWS.config.update({
+  accessKeyId: 'AKIAJ7K2NIQTW3TPDOWA',
+  secretAccessKey: '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',
+  region: 'us-west-1'
+});
+
+var S3 = new AWS.S3({params: {Bucket: 'ttd-service-image-storage'}});
+var Dynamo = new AWS.DynamoDB.DocumentClient({region: 'us-west-1'});
+
+// Fetch the gallery name from the gallery input
+function getGalleryName() {
+  return document.getElementById('gallery-name').value;
+}
+</script>
+</head>
+<body>
+
+
+Image: <input type="file" id="file-chooser" />
+<br>
+Gallery: <input type="text" id="gallery-name" />
+<br>
+
+<button id="upload-button">Upload Image</button>
+<button id="list-images">List images in gallery </button>
+
+<ul id="image-list" />
+
+
+<script>
+// Grab a reference to the upload button
+var uploadButton = document.getElementById("upload-button");
+
+// Make the button respond to clicks
+uploadButton.addEventListener('click', function() {
+  var fileChooser = document.getElementById('file-chooser');
+  var file = fileChooser.files[0];
+
+  console.log(file);
+  
+  // Check that the user has specified a file to upload
+  if (!file) {
+    alert("You must choose a file to upload!");
+    return;
+  }
+
+  // Check the MIME type is an image
+  if (file.type.indexOf("image") == -1) {
+    alert("You may only upload images");
+    return;
+  }
+
+  // Get the gallery name and check that it isn't empty
+  var galleryName = getGalleryName();
+  if (!galleryName) {
+    alert("You need to enter a gallery name");
+    return;
+  }
+
+  // Specify the S3 upload parameters
+  var params3 = {
+    Key: galleryName + '/' + file.name,
+    ContentType: file.type,
+    Body: file,
+    ACL: 'public-read'
+  };
+
+  // Upload the file to s3
+  S3.upload(params3, function(err, data) {
+    if (err) {
+      alert(err);
+    } else {
+      alert("Image uploaded to s3 successfully!");
+    }
+  });
+  
+  var paramDB = {
+    TableName:"image-index",
+    Item: {
+	  "gallery":galleryName,
+	  "file_path":"https://s3-us-west-1.amazonaws.com/ttd-service-image-storage/" + galleryName + "/" + file.name
+	}
+  };
+  
+  
+  Dynamo.put(paramDB, function(err, data) {
+	if (err) {
+	  alert("Dynamo error: " + err);
+	}else {
+      alert("Image uploaded to DB successfully!");
+	}
+  });
+  
+  
+});
+
+
+// Get a reference to the button to list images
+var listImagesButton = document.getElementById('list-images');
+
+// Upon click, fetch the index from Dynamo and use that to
+// fetch images in the specified gallery
+listImagesButton.addEventListener('click', function() {
+  var galleryName = getGalleryName();
+  if (!galleryName) {
+    alert("Must enter a gallery name to list the images!");
+    return;
+  }
+
+  // Disable the list button so you can't perform multiple fetches at once
+  listImagesButton.disabled = true;
+  // Dispose of any images from previous fetches
+  emptyImageList();
+
+  // Fetch all images in the gallery, then re-enable the list button.
+  listImagesInGallery(galleryName, function(err) {
+    if (err) {
+      alert("Dynamo error: " + err);
+    }
+    listImagesButton.disabled = false;
+  });
+})
+
+// Fetch all images in the given gallery.
+// `startKey` represents the exclusive start key of the Dynamo query.
+// To start a new query, leave `startKey` undefined.
+// This function recursively calls itself until there are no more query pages,
+// and then runs the callback.
+function listImagesInGallery(galleryName, cb, startKey) {
+  var params = {
+    TableName: 'image-index',
+    ProjectionExpression: 'file_path',
+    KeyConditionExpression: 'gallery = :galleryname',
+    ExpressionAttributeValues: {
+      ":galleryname": galleryName
+    },
+    ExclusiveStartKey: startKey,
+  }
+
+  Dynamo.query(params, function (err, data) {
+    if (err) {
+      return cb(err);
+    }
+
+    for (item of data.Items) {
+      appendImageToList(item.file_path);
+    }
+
+    if (data.LastEvaluatedKey) { // there are more pages to fetch
+      // Soon ECMA6 will have tail call optimization :D
+      return listImagesInGallery(galleryName, cb, data.LastEvaluatedKey);
+    } else {
+      return cb(null);
+    }
+  })
+}
+
+// Add an image to the end of the image list
+function appendImageToList(imagePath) {
+  var ul = document.getElementById('image-list');
+  var li = document.createElement('li');
+  var img = document.createElement('img');
+
+  img.src = imagePath;
+  img.style.maxWidth = "200px";
+  
+  console.log("s3 path: " + img.src);
+
+  li.appendChild(img);
+  ul.appendChild(li);
+}
+
+// Remove all images from the image list
+function emptyImageList() {
+  document.getElementById('image-list').innerHTML = '';
+}
+
+</script>
+
+</body>
+
+</html>

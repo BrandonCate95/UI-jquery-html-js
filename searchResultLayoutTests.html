@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<style>
+body{
+	background:#fafafa;
+}
+
+.post{
+	background:#ffffff;
+	border-radius:5px;
+	box-shadow:0 0 15px 2px #e1e1e1;
+	margin-top:20px;
+	width:650px;
+}
+.post:hover{
+	cursor:pointer;
+	box-shadow:0 0 15px 2px #cdcdcd;
+}
+
+
+img{
+	height:400px;
+	max-width:600px;
+	display:block;
+	margin:0 auto;
+	box-shadow: 0 9px 5px 0px #fdfdfd, 0 -9px 5px 0px #fdfdfd, 3px 0 4px -1px #e0e0e0, -3px 0 4px -1px #e0e0e0;
+}
+.title{
+	font-size:30px;
+	padding:10px;
+	border-radius:5px 5px 0 0;
+	box-shadow:0 0 8px 1px #e0e0e0;
+}
+.information{
+	font-size:16px;
+	padding:10px;
+	border-radius:0 0 5px 5px;
+	box-shadow:0 0 8px 1px #e0e0e0;
+}
+#overlay-back {
+    position   : fixed;
+    top        : 0;
+    left       : 0;
+    width      : 100%;
+    height     : 100%;
+    background : #000;
+    opacity    : 0.6;
+    filter     : alpha(opacity=60);
+    z-index    : 5;
+    display    : none;
+}
+
+#overlay {
+    position : fixed;
+    top      : 0;
+    left     : 0;
+    width    : 100%;
+    height   : 100%;
+    z-index  : 10;
+    display  : none;
+} 
+
+.overHidden{
+	overflow:hidden;
+}
+
+.overAuto{
+	overflow:auto;
+}
+.front{
+	position:absolute;
+	width:100%;
+	top:50px;
+	left:50%;
+	margin:0 0 0 -65%;
+	overflow:auto;
+}
+.back{
+	position:absolute;
+	width:100%;
+	top:50px;
+	left:50%;
+	margin:0 0 0 -65%;
+	overflow:auto;
+	z-index:10;
+}
+
+.backGround{
+	position:fixed;
+	overflow:hidden;
+}
+
+.foreGround{
+	position:absolute;
+	overflow:auto;
+}
+.search{
+	width:100%;
+	top:20px;
+	left:50%;
+	margin:0 0 0 -65%;
+}
+
+.popout {
+    animation: popout 1s ease;
+    -webkit-animation: popout 1s ease;
+}
+@keyframes popout {
+    from{transform:scale(.9)}
+    80%{transform:scale(1.1)}
+    to{transform:scale(1)}
+}
+@-webkit-keyframes popout {
+    from{-webkit-transform:scale(.9)}
+    80%{-webkit-transform:scale(1.1)}
+    to{-webkit-transform:scale(1)}
+}
+
+.confirm_selection {
+    -webkit-transition: text-shadow 0.2s linear;
+    -moz-transition: text-shadow 0.2s linear;
+    -ms-transition: text-shadow 0.2s linear;
+    -o-transition: text-shadow 0.2s linear;
+    transition: text-shadow 0.2s linear;
+}
+.confirm_selection:hover {
+    text-shadow: 0 0 30px green;
+}
+
+</style>
+
+<script>
+var prevEl;
+$(function() {
+	$(document).on("click", ".post", function(){
+		
+		console.log(this.id[1]);
+		
+		if(prevEl == this){}//This is if user clicks on same element again, for now nothing will happen
+		else{
+			
+			//get scroll position so on off click user ends up in same place
+			
+			scrollPos = $(window).scrollTop();
+			console.log(scrollPos);
+			
+			
+			var backEl = document.getElementById(2 + this.id[1]);
+			console.log(backEl);
+			
+			$('#front').css("position","fixed");
+			$('#front').css("overflow","hidden");
+		
+			$(backEl).css("display","inline");
+			$(backEl).css("margin-bottom","20px");
+			$(backEl).animate({width:"800px",height:"2000px"});
+			
+			$("#overlay").css("height", "100%");
+			$("#overlay-back").css("height", "100%");
+			$('#overlay, #overlay-back').fadeIn(500);
+			
+			var backArrow = document.createElement("i");
+			backArrow.className = "fa fa-long-arrow-left fa-3x popout confirm_selection";
+			
+			
+			document.getElementById("homeBtn").innerHTML = "";
+			document.getElementById("homeBtn").append(backArrow);
+			
+			prevEl = backEl;
+			
+			
+			
+		}
+		
+		
+		
+	});
+});	
+
+$(document).click(function(event) {
+	if(!$(event.target).closest('.post').length) { //clicks off of front page
+		backToResults(this);
+	}
+});
+
+$(function() {
+	$(document).on("click", "#backArrow", function(){//clicks back arrow icon
+	
+		backToResults(this);
+	
+	});
+});	
+
+
+function backToResults(el){		
+		
+		if(prevEl){
+		
+			$(prevEl).animate({width:"650px",height:"800px;"});
+			$(prevEl).css("display","none");
+				
+		}
+		
+		$("#overlay").css("height", "100%");
+		$("#overlay-back").css("height", "100%");
+		$('#overlay, #overlay-back').fadeOut(300);
+		
+		
+		$('#front').css("position","absolute");
+		$('#front').css("overflow","auto");
+		
+		prevEl = el;
+		
+		console.log(scrollPos);
+		
+		window.scrollTo(0,scrollPos);
+		
+		document.getElementById("homeBtn").innerHTML = "Home";
+	
+}
+
+
+
+</script>
+
+</head>
+<body>
+
+
+
+
+
+<div id="overlay-back"></div>
+<div id="overlay"></div>
+
+<nav class="container-fluid navbar fixed-top navbar-expand-lg navbar-dark bg-dark" style="padding:2px;margin:0;z-index:20;">
+	
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse dual-collapse" style="width:100px;margin:0;height:40px;">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <div id="homeBtn" class="nav-link">Home</div>
+            </li>
+        </ul>
+    </div>
+	
+	<div class="navbar-collapse collapse dual-collapse">
+		<form class="my-2 my-lg-0 nav-item d-flex" style="width:650px;margin-right:455px;">
+			<input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+		</form>
+	</div>
+		
+    <div class="navbar-collapse collapse dual-collapse">
+        <ul class="navbar-nav ml-auto">
+		
+            <li id="user1" class="nav-item dropdown">
+				<button id="callSignIn" class="btn btn-outline-success my-2 my-sm-0 mr-sm-2" type="submit">Sign In</button>
+   
+				<!-- <span id="welcomeText" class="nav-link">Welcome</span> -->
+			</li>
+            <li id="user2" class="nav-item">
+                <button id="callSignUp" class="btn btn-outline-success my-2 my-sm-0 mr-sm-2" type="submit">Sign Up</button>
+         
+				<!-- <button id="signOutBtn" class="btn btn-outline-success my-2 my-sm-0 mr-sm-2" type="submit">Sign Out</button> -->
+			</li>
+        </ul>
+    </div>
+	
+</nav>
+
+
+<div id="front" class="front">
+
+<div class="row justify-content-center">
+
+	<div id="11" class="post overHidden">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/bakeCake2.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="12" class="post">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/bowling1.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="13" class="post">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/resturant1.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="14" class="post">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/concert2.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="15" class="post">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/hiking2.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="16" class="post">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/concert1.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+</div>
+
+
+<div id="back" class="back">
+
+<div class="row justify-content-center">
+
+	<div id="21" id="first" class="post" style="display:none;">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/bakeCake2.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="22" class="post" style="display:none;">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/bowling1.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="23" class="post" style="display:none;">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/resturant1.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="24" class="post" style="display:none;">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/concert2.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="25" class="post" style="display:none;">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/hiking2.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="row justify-content-center">
+
+	<div id="26" class="post" style="display:none;">
+	
+		<div class="title">
+			<span>Title Goes Here!</span>
+		</div>
+		
+		<div class="pic">
+			<img src="Pics/concert1.jpg">
+		</div>
+		
+		<div class="information">
+			<span>Additional Information like prices and location</span>
+		</div>
+		
+	</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

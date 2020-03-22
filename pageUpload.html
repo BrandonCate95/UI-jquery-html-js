@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<!-- best to download these files onto server instead of having to make http requests each call -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.2.1/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.2.1/cropper.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<style>
+body {
+  padding-top: 54px;
+}
+
+@media (min-width: 992px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+.portfolio-item {
+  margin-bottom: 30px;
+}
+
+.pagination {
+  margin-bottom: 30px;
+}
+
+img {
+	max-width:700px;
+	height:auto;
+}
+
+.card:hover{
+	cursor:pointer;
+	box-shadow:0 0 10px 1px #eeeeee;
+}
+
+.wrapper{
+	margin:0 10%;
+}
+.card{
+	border:none;
+}
+.card-body{
+	padding:5px 0px;
+}
+.card-title{
+	font-size:17px;
+	font-weight:bold;
+	margin:0;
+}
+.card-text{
+	font-size:14px;
+}
+.card-location{
+	display:inline;
+
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#7397d1;
+}
+.card-date{
+	display:inline;
+
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#7397d1;
+}
+.card-divider{
+	display:inline;
+	height:5px;
+	padding:0;
+	margin:0;
+	color:#7397d1;
+}
+.card-info{
+	padding-top:2px;
+	padding-bottom:2px;
+}
+.imgDisplay{
+	height:420px;
+	padding:0;
+	background:#565656;
+}
+.images{
+	padding:0;
+	background:#565656;
+}
+.top,.bottom{
+	height:60px;
+	background:white;
+	border-top:1px solid lightgrey;
+	border-bottom:1px solid lightgrey;
+}
+.top{
+	box-shadow:0 4px 2px -2px black;
+}
+.middle{
+	height:300px;
+}
+.images .middle{
+	box-shadow:0 0 50px 1px #9a9a9a inset, 0 0 1px 1px black inset;
+}
+label {
+   cursor: pointer;
+}
+
+#upload-photo {
+   opacity: 0;
+   position: absolute;
+   z-index: -1;
+}
+#imgList{
+	padding:20px;
+	overflow:auto;
+}
+.imgListItem{
+	width:100px;
+	height:100px;
+	margin:5px auto;
+}
+.activeImg{
+	border:2px solid white;
+}
+.btn{
+	border-radius:5px;
+	height:40px;
+}
+#img1{
+	height:100%;
+	max-width:100%;
+	width:auto;
+	box-shadow:none;
+}
+.imageDisplay img{
+	box-shadow:2px 2px 15px 1px black;
+}
+
+.btn-outline-success, .btn-outline-success:visited{
+	margin:auto 4% auto 0;
+	color:#439cdb !important;
+	border-color:#439cdb !important;
+}
+.input-group .btn-outline-success{
+	margin:auto 0 auto 0;
+	border-radius:0;
+	background:white !important;
+	border-color:#439cdb !important;
+}
+
+.btn-outline-success:hover, .btn-outline-success:active{
+	cursor:pointer;
+	color:white !important;
+    background-color:#439cdb !important;
+}
+#deleteImgBtn, #deleteImgBtn:visited{
+	color:red !important;
+	border-color:red !important;
+	outline:none;
+}
+.btn:focus,.btn:active {
+   outline: none !important;
+   box-shadow: none;
+}
+
+#deleteImgBtn:hover, #deleteImgBtn:active{
+	color:white !important;
+    background-color: red !important;
+}
+.hidden{
+	display:none;
+}
+h3{
+	margin:auto 0;
+}
+.row{
+	margin:30px 0;
+}
+.searchForm, .searchPost{
+	padding:0;
+}
+.searchForm{
+	padding-right:4%;
+}
+.fa-question-circle-o{
+	font-size:18px;
+	cursor:pointer;
+	color:#439cdb;
+}
+.card{
+	max-width:250px;
+	height:auto;
+}
+
+.input-addon-start, .input-addon-end{
+	width:50px !important;
+	margin:0 !important;
+}
+.input-addon-end{
+	border-radius:0;
+}
+.calendar{
+	padding:0 !important;
+	border:none;
+}
+.input-addon-title{
+	width:105px !important;
+}
+.input-button{
+	border-radius:0;
+	height:100%;
+}
+.form-control{
+	background:white !important;
+}
+.input-button{
+	cursor:pointer;
+}
+.fa-calendar{
+	color:#439cdb;
+}
+.btn-group{
+	width:100% !important;
+}
+.btn-group .btn-outline-success{
+	margin:auto 0 !important;
+	padding:auto !important;
+	width: 50%;
+}
+.active{
+	background:#439cdb !important;
+	color:white !important;
+}
+.focus,.active{
+	box-shadow:none !important;
+	outline:none !important;
+}
+.input-addon-start{
+	border-radius:0px !important;
+}
+.hiddenForm{
+    height: 0;
+    overflow: hidden;
+}
+.animateShowForm{
+    height: 0;
+    overflow: hidden;
+   -moz-animation: slideForward 0.5s ease 0s forwards;
+   -webkit-animation: slideForward 0.5s ease 0s forwards;
+   -o-animation: slideForward 0.5s ease 0s forwards;
+   -ms-animation: slideForward 0.5s ease 0s forwards;
+    animation: slideForward 0.5s ease 0s forwards;
+}
+
+
+@-moz-keyframes slideForward /* Firefox */
+{
+from {height: 0;}
+to {height: 35.4px;}
+}
+
+@-webkit-keyframes slideForward /* Safari and Chrome */
+{
+from {height: 0;}
+to {height: 35.4px;}
+}
+
+@-ms-keyframes slideForward /* IE10 */
+{
+from {height: 0;}
+to {height: 35.4px;}
+}
+
+@keyframes slideForward
+{
+from {height: 0;}
+to {height: 35.4px;}
+}
+
+.animateHideForm{
+    height: 0px;
+    overflow: hidden;
+   -moz-animation: slideBackward 0.5s ease 0s backwards;
+   -webkit-animation: slideBackward 0.5s ease 0s backwards;
+   -o-animation: slideBackward 0.5s ease 0s backwards;
+   -ms-animation: slideBackward 0.5s ease 0s backwards;
+    animation: slideBackward 0.5s ease 0s backwards;
+}
+
+
+@-moz-keyframes slideBackward /* Firefox */
+{
+from {height: 35.4px;}
+to {height: 0;}
+}
+
+@-webkit-keyframes slideBackward /* Safari and Chrome */
+{
+from {height: 35.4px;}
+to {height: 0;}
+}
+
+@-ms-keyframes slideBackward /* IE10 */
+{
+from {height: 35.4px;}
+to {height: 0;}
+}
+
+@keyframes slideBackward
+{
+from {height: 35.4px;}
+to {height: 0;}
+}
+.animateEventShowForm{
+    height: 0;
+    overflow: hidden;
+   -moz-animation: slideEventForward 0.5s ease 0s forwards;
+   -webkit-animation: slideEventForward 0.5s ease 0s forwards;
+   -o-animation: slideEventForward 0.5s ease 0s forwards;
+   -ms-animation: slideEventForward 0.5s ease 0s forwards;
+    animation: slideEventForward 0.5s ease 0s forwards;
+}
+
+
+@-moz-keyframes slideEventForward /* Firefox */
+{
+from {height: 0;}
+to {height: 247.8px;}
+}
+
+@-webkit-keyframes slideEventForward /* Safari and Chrome */
+{
+from {height: 0;}
+to {height: 247.8px;}
+}
+
+@-ms-keyframes slideEventForward /* IE10 */
+{
+from {height: 0;}
+to {height: 247.8px;}
+}
+
+@keyframes slideEventForward
+{
+from {height: 0;}
+to {height: 247.8px;}
+}
+
+.animateEventHideForm{
+    height: 0px;
+    overflow: hidden;
+   -moz-animation: slideEventBackward 0.5s ease 0s backwards;
+   -webkit-animation: slideEventBackward 0.5s ease 0s backwards;
+   -o-animation: slideEventBackward 0.5s ease 0s backwards;
+   -ms-animation: slideEventBackward 0.5s ease 0s backwards;
+    animation: slideEventBackward 0.5s ease 0s backwards;
+}
+
+
+@-moz-keyframes slideEventBackward /* Firefox */
+{
+from {height: 247.8px;}
+to {height: 0;}
+}
+
+@-webkit-keyframes slideEventBackward /* Safari and Chrome */
+{
+from {height: 247.8px;}
+to {height: 0;}
+}
+
+@-ms-keyframes slideEventBackward /* IE10 */
+{
+from {height: 247.8px;}
+to {height: 0;}
+}
+
+@keyframes slideEventBackward
+{
+from {height: 247.8px;}
+to {height: 0;}
+}
+</style>
+
+</head>
+<body style="padding-top:50px;">
+
+<div class="imageDisplay row">
+
+	<div class="col-2"></div>
+	
+	<div class="col-6 d-flex flex-column imgDisplay">
+		<div class="top d-flex flex-row justify-content-end">
+			<h3 class="mr-auto">Image Display</h3>
+			<button id="cropImgBtn" type="button" class="btn btn-outline-success">Crop Image</button>
+			<button id="stopCropImgBtn" type="button" class="btn btn-outline-success">End Crop</button>
+			<button id="deleteImgBtn" type="button" class="btn btn-outline-success">Delete Image</button>
+		</div>
+		
+		<div class="middle d-flex justify-content-center">
+			<img id="img1" src="#" class="postImg hidden">
+		</div>
+		
+		<div class="bottom d-flex flex-row justify-content-end">
+			<button id="addPostImg" type="button" class="btn btn-outline-success">Add image to search post</button>
+			<button id="addPageImg" type="button" class="btn btn-outline-success">Add image to page</button>
+		</div>
+	</div>
+	
+	<div class="col-2 d-flex flex-column images">
+		<div class="top d-flex justify-content-center">
+			<button id="upload-photo-label" type="button" class="btn btn-outline-success">Upload Image</button>
+			<input type="file" name="photo" id="upload-photo" />	
+		</div>
+		
+		<div id="imgList" class="middle d-flex flex-column">
+
+		</div>
+		
+		<div class="bottom">
+		
+		</div>
+	</div>	
+	
+	<div class="col-2"></div>
+
+
+</div>
+
+<div class="row">
+
+	<div class="col-2"></div>
+	
+	<div class="searchForm col-6">
+	
+
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Title</span>
+			<input id="title" type="text" class="form-control" placeholder="Input group example" aria-describedby="btnGroupAddon">
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center"><i class="fa fa-usd" aria-hidde="true"></i></span>
+			<input id="price" type="text" class="form-control" placeholder="Input group example" aria-describedby="btnGroupAddon">
+			<div class="input-group-btn">
+				<button id="price-dropdown" type="button" class="btn btn-outline-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				per person
+				</button>
+				<div class="dropdown-menu dropdown-menu-right">
+					<div class="dropdown-item">per person</div>
+					<div class="dropdown-item">per hour</div>
+					<div class="dropdown-item">Free</div>
+				</div>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		
+		<div class="btn-group d-flex flex-row" data-toggle="buttons">
+  <label class="btn btn-outline-success active d-flex">
+    <input type="radio" name="options" id="option1" autocomplete="off" checked> Business
+  </label>
+<span class="input-group-addon input-addon-title justify-content-center">Or</span>
+  <label class="btn btn-outline-success d-flex">
+    <input type="radio" name="options" id="option3" autocomplete="off"> Event
+  </label>
+<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+</div>
+		
+		
+
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center">Event</span>
+			<div id="eventStartTime" class="calendar input-group-addon">
+				
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="eventEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		
+		<div class="input-group">
+			
+			<div id="mondayStartTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-title justify-content-center">Monday</span>
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="mondayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		
+		<div class="input-group">
+			
+			<div id="tuesdayStartTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-title justify-content-center">Tuesday</span>
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="tuesdayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		
+		<div class="input-group">
+			
+			<div id="wednesdayStartTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-title justify-content-center">Wednesday</span>
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="wednesdayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		
+		<div class="input-group">
+			
+			<div id="thursdayStartTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-title justify-content-center">Thursday</span>
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="thursdayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+			
+		<div class="input-group">
+			
+			<div id="fridayStartTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-title justify-content-center">Friday</span>
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="fridayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		
+		<div class="input-group">
+			
+			<div id="saturdayStartTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-title justify-content-center">Saturday</span>
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="saturdayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		
+		<div class="input-group">
+			
+			<div id="sundayStartTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-title justify-content-center">Sunday</span>
+				<span class="input-group-addon input-addon-start justify-content-center">Start</span>
+				<input type="text" class="form-control startTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<div id="sundayEndTime" class="calendar input-group-addon">
+				<span class="input-group-addon input-addon-end justify-content-center">End</span>
+				<input type="text" class="form-control endTimeInput" placeholder="Input group example" aria-describedby="btnGroupAddon" data-input>
+				<a class="input-group-addon input-button" title="toggle" data-toggle><i class="fa fa-calendar" aria-hidden="true"></i></a>
+			</div>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>
+		
+		<div class="input-group">
+			<span class="input-group-addon input-addon-title justify-content-center" id="btnGroupAddon">Location URL</span>
+			<input id="place" type="text" class="form-control" placeholder="Input group example" aria-describedby="btnGroupAddon">
+			<button id="analyzeLocation" type="button" class="justify-content-center btn btn-outline-success">Analyze</button>
+			<span class="input-group-addon"><i class="fa fa-question-circle-o"></i></span>
+		</div>	
+		
+		<textarea id="textarea"></textarea>
+	</div>
+	
+	<div class="searchPost col-2 d-flex justify-content-center">
+	
+        <div class="card h-100">
+            <div class="imgContainer"><img id="card-img-top" class="card-img-top" src="https://s3-us-west-1.amazonaws.com/ttd-service-image-storage/test/bowling1.2.jpg" alt=""></div>
+			<div class="card-body">
+				<p id="card-location" class="card-info card-location">CA, Camarillo</p>
+				<h4 id="card-title" class="card-info card-title">Fun Bowling</h4>
+				<p id="card-text" class="card-info card-text"><i class="fa fa-usd"></i><span id="card-price">8</span> <span id="per-amount">per person</span></p>
+            </div>
+        </div>	
+	
+	
+	
+	</div>	
+	
+	<div class="col-2"></div>
+</div>
+
+<iframe id="googleMap" width="600" height="450" frameborder="0" style="border:0" src="" allowfullscreen></iframe>
+
+<script>
+flatpickr('.calendar',{
+    enableTime: true,
+	wrap: true
+});
+
+flatpickr('.time',{
+    enableTime: true,
+	wrap: true,
+	noCalendar: true,
+});
+
+$(function() {
+	$(document).on("click", "#analyzeLocation", function(){
+
+		//https://www.google.com/maps/place/Space+Needle,+400+Broad+St,+Seattle,+WA+98109/@47.6205088,-122.3514743,17z/data=!3m1!4b1!4m5!3m4!1s0x54901545e1eec4d9:0x44cc7208c7c2e533!8m2!3d47.6204232!4d-122.3493552
+	
+		var url = document.getElementById("place").value;
+		
+		var place = extractPlace(url);
+		console.log(place);
+		//construct google iframe make sure to put google api key on restriction before use and set in data js file
+		//https://www.google.com/maps/embed/v1/place?key=AIzaSyBvG_CQ-MplQROCyBbhWgXL_GkhaAcKfiE&q=Space+Needle,+400+Broad+St,+Seattle,+WA+98109
+		var srcURL = "https://www.google.com/maps/embed/v1/place?key=AIzaSyBvG_CQ-MplQROCyBbhWgXL_GkhaAcKfiE&q=" + place;
+		document.getElementById("googleMap").src = srcURL;
+		
+		extractLatLong(place);
+	});
+});
+
+function extractPlace(url){
+	var array = url.split("/");
+	
+	for(var k in array){
+		if(array[k] == "place"){
+			var j = parseInt(k) + 1;
+			return array[j.toString()];
+		}
+	}
+}
+
+function extractLatLong(place){
+    var geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ 'address': place }, function (results, status) {
+
+		if (status == google.maps.GeocoderStatus.OK) {
+			var latitude = results[0].geometry.location.lat();
+			var longitude = results[0].geometry.location.lng();
+			console.log(latitude,longitude);
+		}else{
+			alert('Latitude and Longitude could not be found because: ' + status);
+		}
+		
+    });
+}
+
+
+//cropper script
+$(function() {
+	$(document).on("click", "#cropImgBtn", function(){
+		var image = document.getElementById("img1");
+		//needs to have global scope for on click access
+		cropper = new Cropper(image, {
+			aspectRatio: 13 / 9,
+			background: false,
+			crop: function(e) {
+				console.log(e.detail.x);
+				console.log(e.detail.y);
+				console.log(e.detail.width);
+				console.log(e.detail.height);
+				console.log(e.detail.rotate);
+				console.log(e.detail.scaleX);
+				console.log(e.detail.scaleY);
+		  }
+		});
+	});
+});
+
+$(function() {
+	$(document).on("click", "#stopCropImgBtn", function(){
+		
+		cropper.clear();
+		
+		//cropped image container created needs to be deleted as well
+		if(document.getElementsByClassName("cropper-container")[0]){
+			$(document.getElementsByClassName("cropper-container")[0]).remove();
+		}
+		
+		//leaves cropper-hidden class on img which hides italic
+		if($("#img1").hasClass("cropper-hidden")){
+			$("#img1").removeClass("cropper-hidden");
+		}
+	
+	});
+});
+
+
+$(function() {
+	$(document).on("click", "#addPostImg", function(){
+		
+		if(cropper.getCroppedCanvas()){
+			cropper.getCroppedCanvas();
+			cropper.getCroppedCanvas({
+				width: 130,
+				height: 90,
+				minWidth: 256,
+				minHeight: 256,
+				maxWidth: 4096,
+				maxHeight: 4096,
+				fillColor: '#fff',
+				imageSmoothingEnabled: false,
+				imageSmoothingQuality: 'high',
+			});
+			document.getElementById("card-img-top").src = cropper.getCroppedCanvas().toDataURL();
+		}
+	});
+});
+
+
+//price input dropdown menu click functionality
+$(function() {
+	$(document).on("click", ".dropdown-item", function(){
+	
+		document.getElementById("price-dropdown").innerHTML = this.innerHTML;
+		
+		//<i class="fa fa-usd"></i><span id="card-price">8</span> <span id="per-amount">per person</span>
+		if(document.getElementById("price-dropdown").innerHTML == "Free"){
+			document.getElementById("card-text").innerHTML = this.innerHTML;
+		}else{
+			if(!(document.getElementById("per-amount"))){//if span els not there from 'free' removal
+			
+				var el = document.getElementById("card-text");
+				
+				el.innerHTML = "";
+				
+				var icon = document.createElement("i");
+				icon.className = "fa fa-usd";
+				
+				var price = document.createElement("span");
+				price.id = "card-price";
+				
+				var perAmount = document.createElement("span");
+				perAmount.id = "per-amount";
+								
+				el.append(icon);
+				el.append(price);
+				el.append(perAmount);
+			}
+			document.getElementById("per-amount").innerHTML = " " + this.innerHTML;	
+		}	
+	});
+});
+	
+$(function() {
+	$(document).on("click", "#upload-photo-label", function(){
+		$("#upload-photo").click();
+	});
+});
+
+document.getElementById('upload-photo').onchange = function(event) {
+	console.log('clicked and changed');
+    var fileList = this.files[0];
+    //TODO do something with fileList.  
+    var reader = new FileReader();
+    reader.onloadend = function(){
+
+		if($("#img1").hasClass("hidden")){
+			$("#img1").removeClass("hidden");
+		}
+	
+		document.getElementById("img1").src = reader.result;
+
+		addImgList(reader.result);
+    }	
+    if(fileList){
+        reader.readAsDataURL(fileList);
+    }else{
+    }
+}
+
+function addImgList(data){
+
+	var prevActive = document.getElementsByClassName("activeImg");
+	$(prevActive[0]).removeClass("activeImg");
+	
+	var img = document.createElement("img");
+	img.className = "imgListItem activeImg";
+	img.src = data;
+
+	$("#imgList").append(img);
+}
+
+$(function() {
+	$(document).on("click", ".imgListItem", function(){
+	
+		var prevActive = document.getElementsByClassName("activeImg");
+		$(prevActive[0]).removeClass("activeImg");
+		
+		this.className += " activeImg";
+		document.getElementById("img1").src = this.src;
+	
+	});
+});
+
+$(function() {
+	$(document).on("click", "#deleteImgBtn", function(){
+	
+		var delListImg = document.getElementsByClassName("activeImg");
+		$(delListImg[0]).remove();
+		
+		//cropped image container created needs to be deleted as well
+		if(document.getElementsByClassName("cropper-container")[0]){
+			$(document.getElementsByClassName("cropper-container")[0]).remove();
+		}
+		
+		//leaves cropper-hidden class on img which hides italic
+		if($("#img1").hasClass("cropper-hidden")){
+			$("#img1").removeClass("cropper-hidden");
+		}
+		
+		if(document.getElementsByClassName("imgListItem")[0]){
+			var imgList = document.getElementsByClassName("imgListItem");
+			imgList[0].className += " activeImg";
+			document.getElementById("img1").src = imgList[0].src;
+		}else{//empty image list
+			document.getElementById("img1").src = "#";
+			document.getElementById("img1").className += " hidden";
+		}
+	
+	});
+});	
+
+$(function() {
+ $('.form-control').on("propertychange change click keyup input paste", function() {
+
+	//if(this == document.getElementById("place")){
+	//	document.getElementById("card-location").innerHTML = this.value;
+	if(this == document.getElementById("title")){
+		document.getElementById("card-title").innerHTML = this.value;
+	}else if(this == document.getElementById("price")){
+		if(document.getElementById("card-price")){//could be removed whenever user enters free option and tries to type still
+			document.getElementById("card-price").innerHTML = this.value;
+		}
+	}
+
+	});
+});
+ 
+$(function() {
+	$('.form-control').on("propertychange change click keyup input paste", function() {
+	
+	});
+});
+
+</script>
+
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvG_CQ-MplQROCyBbhWgXL_GkhaAcKfiE">
+    </script>
+</body>
+</html>

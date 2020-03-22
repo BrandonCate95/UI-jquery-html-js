@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<style>
+body {
+  padding-top: 54px;
+}
+
+@media (min-width: 992px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+.portfolio-item {
+  margin-bottom: 30px;
+}
+
+.pagination {
+  margin-bottom: 30px;
+}
+
+.card-img-top{
+	max-width:700px;
+	height:auto;
+}
+
+.card:hover{
+	cursor:pointer;
+	box-shadow:0 0 10px 1px #eeeeee;
+}
+
+.searchWrapper{
+	margin:0 10%;
+}
+.card{
+	border:none;
+}
+.card-body{
+	padding:5px 0px;
+}
+.card-title{
+	font-size:17px;
+	font-weight:bold;
+	margin:0;
+}
+.card-text{
+	font-size:14px;
+}
+.card-location{
+	display:inline;
+
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#7397d1;
+}
+.card-date{
+	display:inline;
+
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#7397d1;
+}
+.card-divider{
+	display:inline;
+	height:5px;
+	padding:0;
+	margin:0;
+	color:#7397d1;
+}
+.card-info{
+	padding-top:2px;
+	padding-bottom:2px;
+}
+
+</style>
+
+</head>
+<body>
+
+    <!-- Page Content -->
+	<div class='searchWrapper'>
+
+      <div class="row">
+        <div class="col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item">
+          <div class="card h-100">
+            <div class="imgContainer"><img class="card-img-top" src="https://s3-us-west-1.amazonaws.com/ttd-service-image-storage/test/bakeCake1.2.jpg" alt=""></div>
+			<div class="card-body">
+			  <div class="card-text-top">
+				<p class="card-info card-location">CA, Camarillo</p>
+				<div class="card-divider">&#8729;</div>
+				<p class="card-info card-date">Feb, 18</p>
+			  </div>
+              <h4 class="card-info card-title">Bake with a professional chef</h4>
+              <p class="card-info card-text">$30 per person</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item">
+          <div class="card h-100">
+            <div class="imgContainer"><img class="card-img-top" src="https://s3-us-west-1.amazonaws.com/ttd-service-image-storage/test/bowling1.2.jpg" alt=""></div>
+            <div class="card-body">
+			  <p class="card-info card-location">CA, Camarillo</p>
+              <h4 class="card-info card-title">Fun Bowling</h4>
+              <p class="card-info card-text">$8 per person</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item">
+          <div class="card h-100">
+            <div class="imgContainer"><img class="card-img-top" src="https://s3-us-west-1.amazonaws.com/ttd-service-image-storage/test/concert1.2.jpg" alt=""></div>
+            <div class="card-body">
+			  <p class="card-info card-location">CA, Camarillo</p>
+              <h4 class="card-info card-title">The Sticks at Rock Stadium</h4>
+              <p class="card-info card-text">$20 per person</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item">
+          <div class="card h-100">
+            <div class="imgContainer"><img class="card-img-top" src="https://s3-us-west-1.amazonaws.com/ttd-service-image-storage/test/hiking1.2.jpg" alt=""></div>
+            <div class="card-body">
+			  <p class="card-info card-location">CA, Camarillo</p>
+              <h4 class="card-info card-title">Hike Mount Everest</h4>
+              <p class="card-info card-text">$120 per person</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item">
+          <div class="card h-100">
+            <div class="imgContainer"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></div>
+            <div class="card-body">
+              <h4 class="card-title">
+                <a href="#">Project Five</a>
+              </h4>
+              <p class="card-text">$ per person</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item">
+          <div class="card h-100">
+            <div class="imgContainer"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></div>
+            <div class="card-body">
+              <h4 class="card-title">
+                <a href="#">Project Six</a>
+              </h4>
+              <p class="card-text">$ per person</p>
+            </div>
+          </div>
+        </div>
+		<div class="col-xl-3 col-lg-4 col-md-6 col-6 portfolio-item">
+          <div class="card h-100">
+            <div class="imgContainer"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></div>
+            <div class="card-body">
+              <h4 class="card-title">
+                <a href="#">Project Seven</a>
+              </h4>
+              <p class="card-text">$ per person</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.row -->
+	</div>
+	  
+</body>
+</html>

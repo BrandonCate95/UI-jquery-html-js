@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.154.0.min.js"></script>
+
+<style>
+
+.wrapper{
+	position:absolute;
+	top:50px;
+	left:500px;
+	background:lightgrey;
+	width:200px;
+	height:200px;
+}
+
+</style>
+
+
+</head>
+<body>
+
+<div id="mainContent">
+Test
+
+<div id="content"></div>
+
+<input type="text" id="searchText" placeholder="Search...">
+<input type="submit" id="Search" value="Search">
+<br>
+<input type="text" id="pageText" placeholder="Page...">
+<input type="submit" id="Page" value="Submit">
+
+</div>
+
+<textarea id="textarea" style="width:300px;height:400px;"></textarea>
+
+<script>
+
+AWS.config.update({
+  region: 'us-west-1',
+  accessKeyId: 'AKIAJZH5MFCWDXTY7HHA',
+  secretAccessKey: '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'
+});
+
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+function getURLParams() {
+
+	var urlParams;
+
+    var match,
+       pl     = /\+/g,  // Regex for replacing addition symbol with a space
+       search = /([^&=]+)=?([^&]*)/g,
+       decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+       query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query)){
+       urlParams[decode(match[1])] = decode(match[2]);
+	}
+	return urlParams;
+}
+
+function loadPage(pg,onPageInput){
+
+	var table = "ttdTest3";
+    var title = pg;
+
+    var params = {
+        TableName: table,
+        Key:{
+            "title": title
+        }
+    };
+    docClient.get(params, function(err, data) {
+        if (err) {
+			console.log(err);
+        } else {
+			createPage(data.Item,onPageInput);
+        }
+    });
+}
+
+function createPage(data,onPageInput){
+	var div = document.createElement("div");
+	div.id = "wrapper";
+	div.className = "wrapper";
+	
+	var br = document.createElement("br");
+	
+	div.append(data.title);
+	div.append(data.description);
+	
+	$('body').append(div);
+	
+	processAjaxData(onPageInput);
+}
+
+function searchReq(query,onPageInput){
+
+	var http = new XMLHttpRequest();
+		
+	var formData = new FormData();
+		
+	var userSearchDomain = 'http://search-ttd-domain-test2-gsolgnte4fhaxqyyhm7cy6mgje.us-west-1.cloudsearch.amazonaws.com/2013-01-01/';
+
+	formData.append("URL", userSearchDomain + "search?q=" + query + "&return=title,description,link,location,price,img_path");
+		
+	http.open("POST", "/ttdTestServer/info.php", true);
+	http.send(formData);
+
+	http.onreadystatechange = function() {//Call a function when the state changes.
+		if(http.readyState == 4 && http.status == 200) {
+			var JSONString = http.responseText;
+			var JSONObject = JSON.parse(JSON.parse(JSONString)); //There are two parses here as the first strips outer quotes and forward slashes while the second converts now readable JSON string into JSON object
+			if(document.getElementById("textarea")){ //added for debugging purposes on addItem page
+				document.getElementById("textarea").innerHTML = JSON.stringify(JSONObject["hits"]["hit"]);
+			}
+			
+			processAjaxData(onPageInput);
+		}
+	}
+}
+
+
+function processAjaxData(onPageInput){
+	
+	//setting all parameters
+	if(params.q){
+		var search = params.q;
+		params.q = "";//set to null or messes shit up
+		
+	}else{
+		var search = document.getElementById("searchText").value;
+	}
+	
+	if(search){
+		var url = "http://localhost/UI/URLGetTest.html?q=" + search;
+		console.log(url);
+	}
+	
+	var searchData = document.getElementById("textarea").innerHTML;
+	
+	if(params.pg){
+		var pageTitle = params.pg;
+		params.pg = "";//set to null or messes shit up
+	}else{
+		var pageTitle = document.getElementById("pageText").value;
+	}
+	
+	if(pageTitle){
+		var url = "http://localhost/UI/URLGetTest.html?pg=" + pageTitle;
+	}
+	
+	if(document.getElementById('wrapper')){
+		var pageData = document.getElementById('wrapper').innerHTML;
+	}else{
+		var pageData = "";
+	}
+	
+	if(!url){
+		var url = "http://localhost/UI/URLGetTest.html";
+	}	
+	
+	
+	
+	if(onPageInput){//search or page click on website, need to pushstack to create new history
+		window.history.pushState({"search":search,"searchData":searchData,"pageTitle":pageTitle,"pageData":pageData},"", url);
+	}else{
+		window.history.replaceState({"search":search,"searchData":searchData,"pageTitle":pageTitle,"pageData":pageData},"", url);
+	}
+	
+	
+	
+}
+
+window.onpopstate = function(e){
+	
+    if(e.state){
+		console.log("getting state data");
+		
+		if(e.state.search){
+			document.getElementById("searchText").value = e.state.search;
+		}else{
+			document.getElementById("searchText").value = "";
+		}
+		if(e.state.searchData){
+			document.getElementById("textarea").innerHTML = e.state.searchData;
+		}else{
+			document.getElementById("textarea").innerHTML = "";
+		}
+		if(e.state.pageTitle){
+			document.getElementById("pageText").value = e.state.pageTitle;
+		}else{
+			document.getElementById("pageText").value = "";		
+		}
+		if(e.state.pageData){//have to check if page is up or not as well
+			if(document.getElementById('wrapper')){
+				document.getElementById("wrapper").innerHTML = e.state.pageData;
+			}else{
+				var div = document.createElement("div");
+				div.id = "wrapper";
+				div.className = "wrapper";
+	
+				div.append(e.state.pageData);
+	
+				$('body').append(div);
+			}
+		}else if(document.getElementById('wrapper')){
+			$('#wrapper').remove();
+		}
+    }
+};
+
+
+</script>
+
+<script>
+//script runs whenever user enters in URL
+params = getURLParams();
+
+if(params.q){//run search load script
+	searchReq(params.q,false);
+}else if(params.pg){//run page load script
+	loadPage(params.pg,false);
+}else{//either a refresh or connect to homepage
+	processAjaxData(false);
+}
+
+//scrips run on user interaction
+$(function() {
+	$(document).on("click", "#Search", function(){
+	
+		if(document.getElementById('wrapper')){//get rid off page up if you search on page
+			console.log("wrapper removal attempt");
+			$('#wrapper').remove();
+		}
+		if(document.getElementById('pageText')){
+			document.getElementById('pageText').value = "";
+		}
+	
+	
+		var query = document.getElementById("searchText").value;
+		searchReq(query,true);
+	});
+});
+
+$(function() {
+	$(document).on("click", "#Page", function(){
+	
+		if(document.getElementById('wrapper')){
+			console.log("remove attempt");
+			$('#wrapper').remove();
+		}
+	
+		if(document.getElementById('textarea').innerHTML){//get rid off page up if you search on page
+			document.getElementById('textarea').innerHTML = "";
+		}
+		if(document.getElementById('searchText')){
+			document.getElementById('searchText').value = "";
+		}
+	
+	
+		var pg = document.getElementById("pageText").value;
+		loadPage(pg,true);
+	});
+});
+
+
+
+</script>
+
+
+
+</body>
+</html>

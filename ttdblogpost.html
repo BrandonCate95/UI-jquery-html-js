@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+
+<title>Dynamic Form</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://rawcdn.githack.com/eligrey/FileSaver.js/master/FileSaver.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.154.0.min.js"></script>
+  
+<script language="javascript"> 
+
+//Known problems: Whenever searching for items that do not have all required fields then will throw 404 error, because one of the fields is not defined (ex:img_path) this can be fixed with some try and catch statements
+
+
+
+//adds post form to be filled out
+var postNum = 1;
+
+AWS.config.update({
+  region: "us-west-1",
+  //endpoint: 'search-ttd-domain-test2-gsolgnte4fhaxqyyhm7cy6mgje.us-west-1.cloudsearch.amazonaws.com',
+  // accessKeyId default can be used while using the downloadable version of DynamoDB. 
+  // For security reasons, do not store AWS Credentials in your files. Use Amazon Cognito instead.
+  accessKeyId: "AKIAIVI35QVTSEP2QXTQ",
+  // secretAccessKey default can be used while using the downloadable version of DynamoDB. 
+  // For security reasons, do not store AWS Credentials in your files. Use Amazon Cognito instead.
+  secretAccessKey: "PQPCrBxwOoTIS907CdRbOOhy2D6ZMAkFVv4iciee"
+});
+
+var S3 = new AWS.S3({params: {Bucket: 'ttd-service-image-storage'}});
+var dynamodb = new AWS.DynamoDB();
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+$(function() {
+  $(document).on("click", ".location", function(){
+	var num = this.id[this.id.length-1];
+	if(this.id[0] == "s")//for search result case
+	{
+		var el1 = document.getElementById("searchLocationLink" + num);
+		var el2 = document.getElementById("searchLocationLinkArrow" + num);
+	}else //for posting case
+	{
+		var el1 = document.getElementById("locationLink" + num);
+		var el2 = document.getElementById("locationLinkArrow" + num);
+	}
+
+    if($(el1).hasClass('visible')) {
+	  el1.classList.remove("visible");
+	  el1.className += " hidden";
+	  
+	  el2.classList.remove("visible");
+	  el2.className += " hidden";
+    } else {
+	  el1.classList.remove("hidden");
+	  el1.className += " visible";
+	  
+	  el2.classList.remove("hidden");
+	  el2.className += " visible";
+	  
+    }
+    return false;
+  });
+
+});
+
+$(function() {
+	$(document).on("click", "#Search", function(){
+
+		var http = new XMLHttpRequest();
+		
+		var query = document.getElementById("searchText").value;
+		
+		var formData = new FormData();
+		formData.append("URL","http://search-ttd-domain-test2-gsolgnte4fhaxqyyhm7cy6mgje.us-west-1.cloudsearch.amazonaws.com/2013-01-01/search?q=" + query + "&return=title,description,link,location,price,img_path");
+		
+		http.open("POST", "http://localhost/UI/info.php", true);
+		http.send(formData);
+
+		http.onreadystatechange = function() {//Call a function when the state changes.
+			if(http.readyState == 4 && http.status == 200) {
+				var JSONString = http.responseText;
+				var JSONObject = JSON.parse(JSON.parse(JSONString)); //There are two parses here as the first strips outer quotes and forward slashes while the second converts now readable JSON string into JSON object
+				//document.getElementById("textarea").innerHTML = JSON.stringify(JSONObject["hits"]["hit"]); uncomment for debugging purposes
+				
+				formatData(JSONObject["hits"]["hit"]);
+			}
+		}		
+	});
+});
+
+function formatData(obj)//basically add_post w/o additional info section and obj data inside thier respective element values
+{
+
+	document.getElementById("search_results").innerHTML = "";
+	
+	for(var j in obj)
+	{
+		console.log(obj[j]["fields"]);
+	}
+	
+	for(var k in obj)
+	{
+	//tabbing indicates what elements are inside what other elements for easier viewing
+	
+	//if(!obj[k]["fields"]){console.log("Object here!");}
+	
+	console.log(obj[k]["fields"]);
+	var rowContainer = document.createElement("div");
+	rowContainer.id = "searchRow" + k;
+	rowContainer.className = "row container-fluid";
+	
+		console.log("1");
+	
+		var div1 = document.createElement("div");
+		div1.id = "searchLeft" + k;
+		div1.className = "col-sm-2 searchResult";
+		
+		var div2 = document.createElement("div");
+		div2.id = "searchPost" + k;
+		div2.className = "col-sm-8 searchResult";
+	
+			var pic = document.createElement("div");
+			pic.className = "searchResult searchPic";
+			pic.style.backgroundImage = "url('" + obj[k]["fields"]["img_path"] + "')";
+			pic.id = "searchPic" + k;	
+	
+				//leaving as may use for img element is better setting background of pic element
+				
+				//var picForm = document.createElement("form");
+				//picForm.id = "picForm" + searchNum;
+				//picForm.className = "picForm";
+				
+					//var picInput = document.createElement("input");
+					//picInput.type = "file";
+					//picInput.id = "picInput" + searchNum;
+					//picInput.className = "picInput";
+					
+					//var img = document.createElement("img");
+					//img.id = "img" + searchNum;
+					//img.src = "#";
+					//img.className = "postImg";
+	
+			var desc = document.createElement("div");
+			desc.className = "searchResult searchDesc";
+			desc.id = "searchDesc" + k;
+			
+					console.log("2");
+				
+					var title = document.createElement("div");
+					title.innerHTML = obj[k]["fields"]["title"];
+					title.className = "title input top";
+					title.id = "searchTitle" + k;
+					
+					var price = document.createElement("div");
+					price.innerHTML = obj[k]["fields"]["price"];
+					price.className = "price top";
+					price.id = "searchPrice" + k;
+					
+					var info = document.createElement("div");
+					info.innerHTML = obj[k]["fields"]["description"];
+					info.className = "info input";
+					info.id = "searchInfo" + k;
+					
+					var link = document.createElement("div");
+					link.innerHTML = obj[k]["fields"]["link"];
+					link.className = "searchLink input";
+					link.id = "searchLink" + k;
+					
+					var loc = document.createElement("i");
+					loc.className = "fa fa-map-marker fa-fw fa-lg location";
+					loc.setAttribute("aria-hidden", "true");
+					loc.id = "searchLocation" + k;
+					
+						var locLink = document.createElement("div");
+						locLink.className = "searchLocationLink hidden";
+						locLink.innerHTML = obj[k]["fields"]["location"];
+						locLink.id = "searchLocationLink" + k;
+						
+						var locLinkArrow = document.createElement("div");
+						locLinkArrow.className = "arrow hidden";
+						locLinkArrow.id = "searchLocationLinkArrow" + k;
+						
+		var div3 = document.createElement("div");
+		div3.id = "searchRight" + k;
+		div3.className = "col-sm-2 searchResult";
+		
+		
+	//BEGIN DIV2 APPENDS
+	
+	console.log("3");
+	
+	div2.append(pic);
+	
+	
+	loc.append(locLinkArrow);
+	
+	desc.append(locLink);
+	desc.append(title);
+	desc.append(price);
+	desc.append(info);
+	desc.append(link);
+	desc.append(loc);
+	
+	div2.append(desc);
+
+	//END DIV2 APPENDS
+	
+	//BEGIN DIV3 APPENDS
+	
+	rowContainer.append(div1);
+	rowContainer.append(div2);
+	rowContainer.append(div3);
+	
+	console.log("4");
+	
+	document.getElementById("search_results").append(rowContainer);
+		
+	
+	}
+}
+
+</script>
+
+<style>
+
+.searchResult
+{
+	display:inline;
+	padding:0px;
+	height:220px;
+}
+
+.searchDesc
+{
+	position:absolute;
+	width:75%;
+	left:25%;
+	height:200px;
+	padding:10px;
+	border:1px solid;
+}
+
+.searchPic
+{
+	position:absolute;
+	width:25%;
+	background-repeat:no-repeat;
+	background-size:100% 100%;
+	height:200px;
+	border:1px solid;
+}
+
+.container-fluid
+{
+	padding:0px;
+	margin:0px;
+}
+
+.hidden
+{
+	opacity:0;
+}
+
+.visible
+{
+	opacity:1;
+}
+
+.descForm
+{
+	height:100%;
+	padding:10px;
+}
+
+.title
+{
+	display:inline-block;
+	height:25%;
+	width:75%;
+	font-size:34px;
+	font-weight:bold;
+}
+
+.price
+{
+	float:right;
+	height:25%;
+	width:24%;
+	text-align:center;
+	background-color:#eeeeee;
+	border-radius:15px;
+	border-color:grey;
+	border-style:outset;
+	font-size:26px;
+}
+
+.info
+{
+	height:56%;
+	width:100%;
+	padding:2px;
+}
+
+.searchLink
+{
+	display:inline-block;
+	margin-top:5px;
+	color:blue;
+	height:15%;
+	width:90%;
+}
+
+.input
+{
+	border:1px solid;
+	border-radius:4px;
+	border-color:#efefef;
+}
+
+
+.location
+{
+	position:relative;
+	width:10%;
+	height:15%;
+}
+
+.searchLocationLink
+{
+	position:absolute;
+	width:200px;
+	bottom:22%;
+	left:93%;
+	margin-left:-30px;
+	padding-left:3px;
+	border-radius:5px;
+	border:2px solid grey;
+	background-color:white;
+}
+
+.arrow
+{
+	position:relative;
+	width: 5px; 
+	height: 15px; 
+	bottom:30px;
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-top: 10px solid grey;
+	
+	margin:auto;
+	padding: 0 0px 0 0px;
+}
+.mainTitle
+{
+	text-align:center;
+	height:350px;
+	padding-top:150px;
+}
+#ttd
+{
+	font-family: Impact, serif;
+	font-size:50px;
+}
+.searchBar
+{
+	margin-top:20px;
+}
+
+#searchText
+{
+	display:inline;
+	width:450px;
+	height:35px;
+	margin:auto;
+	font-size:16px;
+}
+#Search
+{
+	width:60px;
+	height:35px;
+	margin:auto;
+	font-size:16px;
+}
+
+
+</style>
+  
+</head>
+<body>
+
+<body style="position:relative;top:45px;" onload="">
+
+<nav class="container-fluid navbar fixed-top navbar-expand-lg navbar-dark bg-dark" style="padding-top:2.2px;padding-bottom:2.2px;margin:0;">
+  <a class="navbar-brand" style="padding-left:10px;" href="#">Navbar</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="blog.html">Blog</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Disabled</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown link
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="#">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0" style="padding-right:10px;padding-top:0;padding-bottom:0;margin:0;">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" style="padding-right:0px;">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+
+
+<div class="row container-fluid justify-content-center">
+	<div class="col-sm-8 mainTitle">
+		<h1 id="ttd">Find Things To Do</h1>
+		<div id="searchTitle1" class="searchBar">
+			<input type="search" id="searchText" name="searchText" placeholder="query...">
+			<input type="button" id="Search" value="Search">
+		</div>
+	</div>
+</div>
+
+
+<br>
+
+<!-- <textarea readonly id= "textarea" placeholder="Relevant data from list, describe, and create table will show up here" style="width:600px; height:400px"></textarea> -->
+
+
+<div id="search_results">
+
+</div>
+
+
+</body>
+
+</html>

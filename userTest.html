@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.154.0.min.js"></script>
+<!-- important MUST INCLUDED these files by direct download -->
+
+<script src="aws-cognito-sdk.min.js"></script>
+<script src="amazon-cognito-identity.min.js"></script>
+
+
+
+<script language="javascript">
+
+AWSCognito.config.region = 'us-east-2'; //This is required to derive the endpoint
+
+//onload run to check if user is already signed in
+var data = { UserPoolId : 'us-east-2_ZX9XT03Iz',
+    ClientId : '48o24i7hd9stp18lh24hc3tdfb'
+};
+var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+var cognitoUser = userPool.getCurrentUser();
+if (cognitoUser != null) {
+    cognitoUser.getSession(function(err, session) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log(session);
+    });
+}
+</script>
+</head>
+<body>
+
+<form action="/UI/SignIn.html">
+	<input type="submit" value="Redirect">
+</form>
+
+</body>
+
+</html>

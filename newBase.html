@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dynamic Form</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://rawcdn.githack.com/eligrey/FileSaver.js/master/FileSaver.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+
+
+<script language="javascript">
+
+$(document).ready(function(){   
+	$("#save").click(function() {
+		var rendered = $('html').html(); 
+		var formData = new FormData();
+		
+		var pgName = document.getElementById("pageName1").value;
+		formData.append("content", rendered);
+		formData.append("pageName", pgName);
+		
+		var request = new XMLHttpRequest();
+		request.open("POST", "http://localhost/myPHP.php");
+		request.send(formData);
+		
+		alert("Page Saved as " + pgName);		
+	});      
+});
+
+function add_tags(tags)
+{
+    document.execCommand(tags);
+}
+
+function add_tag_h3()
+{
+    document.execCommand("fontSize", false, "5");
+}
+
+function remove_tag_h3()
+{
+	document.execCommand("fontSize", false, "3");
+}
+
+function add_link()
+{
+	var url = document.getElementById("addLinkIn").value;
+	document.execCommand("CreateLink", false, url);
+}
+
+function remove_link()
+{
+	document.execCommand("unlink");
+}
+
+function add_code() {
+    var div1 = document.createElement("div");
+	var div2 = document.createElement("div");
+    div2.className = "codeSnipet";
+    
+	//two extra cases: 1) when new div el added inside editable-div as newlines and 2) when click inside/outside new-code div 
+    if (window.getSelection && 
+	(window.getSelection().anchorNode.parentElement.id || window.getSelection().anchorNode.parentElement.parentElement.id) == "contentArea") {
+        var sel = window.getSelection();
+        if (sel.rangeCount) {
+			var range = sel.getRangeAt(0).cloneRange();
+			range.surroundContents(div1);
+			range.surroundContents(div2);
+			sel.removeAllRanges();
+			sel.addRange(range);
+        }
+    }
+	
+	var closeBtn = document.createElement("input");
+	closeBtn.type = "button";
+	closeBtn.value = "X";
+	closeBtn.name = "closeButton";
+	closeBtn.className = "closeBtn";
+	closeBtn.onclick = function() {
+		remove_code(closeBtn, window.getSelection());
+	};
+	
+		
+	
+	//position close button
+	//var rect = get_box_positions(div2);
+	//var screen = get_box_positions(document.getElementById("blogBody"));
+	//var posHorizontal = rect.top - 15 - screen.top;
+	//var posVertical = rect.right - 15 - screen.right;
+	//console.log(posHorizontal,posVertical)
+	//closeBtn.style = "position:absolute;top:" + posHorizontal + "px;right:" + posVertical + "px;";
+	
+	
+	div2.insertBefore(closeBtn,div1);
+	
+	//make so cant delete close button
+	$(".closeBtn").attr("readonly", "true");
+	
+	//add space after code div
+	var space = document.createElement("br");
+	var par = div2.parentElement;
+	par.appendChild(space);	
+	
+}
+
+function remove_code(btn, divText){
+	var child = btn.parentElement;
+	var parent = child.parentElement;
+	
+	parent.removeChild(child);
+}
+
+function print_sel(){
+	console.log(document.getSelection().anchorNode.parentElement.id);
+}
+
+function get_box_positions(el){
+	var domRect = el.getBoundingClientRect();
+	return domRect;
+}
+
+//this is old code needs to be redone at some point
+function editTitle()
+{
+currentTitle = document.getElementById("title").innerHTML;
+document.getElementById("title").innerHTML = "<form name=form action=post method=>"
+	  + "<input type=text name=Title id=title-form value=" + currentTitle + ">"
+	  + "</form>";
+	  
+document.getElementById("titleSideBar").innerHTML = "<form name=form action=post method=>"
+      + "<input type=button value=submit onClick=addEditedTitle()>"
+      + "</form>";
+}
+
+function addEditedTitle(){
+newTitle = document.getElementById("title-form").value;
+document.getElementById("title").innerHTML = newTitle;
+
+document.getElementById("titleSideBar").innerHTML = "<form name=form action=post method=>"
+      + "<input type=button value=edit onClick=editTitle()>"
+      + "</form>";
+}
+
+</script>
+<style>
+.col-sm-2 {
+  padding-left:20px;
+}
+.col-sm-8 {
+  padding:0;
+}
+h1{
+  font-size:60px;
+}
+h3 {
+  padding-top:10px;
+  padding-bottom:10px;
+  margin:0px;
+}
+form {
+  padding-top:10px;
+  padding-bottom:10px;
+}
+p {
+margin:0;
+}
+
+#contentArea{
+background-color:rgb(250,250,250);
+padding:5px;
+}
+
+.stylize{
+height:40px;
+width:40px;
+margin:10px 0px 10px 0px;
+}
+
+.codeSnipet{
+background-color:rgb(240,240,240);
+padding:10px;
+}
+
+.closeBtn{
+float: right;
+}
+
+form {}
+</style>
+</head>
+<body style="position:relative;top:45px;" onload="">
+
+<nav class="container-fluid navbar fixed-top navbar-expand-lg navbar-dark bg-dark" style="padding-top:2.2px;padding-bottom:2.2px;margin:0;">
+  <a class="navbar-brand" style="padding-left:10px;" href="#">Navbar</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="blog.html">Blog</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Disabled</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown link
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="#">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0" style="padding-right:10px;padding-top:0;padding-bottom:0;margin:0;">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" style="padding-right:0px;">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+
+<div class="col-sm-2 pre-scrollable fixed-top" style="background-color:grey;color:white;overflow-y:auto;max-height:94.5vh;top:44.4px;">
+      <ul>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+        <li>Hello</li>
+      </ul>
+    </div>
+	
+	
+<div class="container-fluid">
+  <div class="row" style="padding:40px;">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8 diffColor">
+      <h1 id="title">Title Goes here</h1>
+	</div>
+	<div id="titleSideBar" class="col-sm-2 diffColor">
+      <form name="form" action="post" method="">
+      <input type="button" value="edit" onClick="editTitle()">
+      </form>
+	</div>
+  </div>
+</div>
+
+<div id="blogBody" class="container-fluid">
+  <div class="row" style="padding:20px 40px 0px 40px;">
+    <div class="col-sm-2"></div>
+	
+    <div id="blogBody8" class= "col-sm-8 diffColor" style="word-wrap: break-word;">
+
+	  <div id="contentArea" class="container_contenteditable container-fluid" contenteditable>Type here...</div>
+	
+	</div>
+	
+	<div id="blogBody2" class="col-sm-2 diffColor">
+	  
+	  <input class="stylize" type="button" value="B" style="font-weight:bold;" onclick='add_tags("bold");'>
+	  <br />
+	  <input class="stylize" type="button" value="I" style="font-weight:bold;" onclick='add_tags("italic");'>
+	  <br />
+	  <input class="stylize" type="button" value="U" style="font-weight:bold;" onclick='add_tags("underline");'>
+	  <br />
+	  <input class="stylize" type="button" value="H3" style="font-weight:bold;" onclick='add_tag_h3();'>
+	  <br />
+	  <input class="stylize" type="button" value="H3" style="font-weight:bold;text-decoration:line-through;" onclick='remove_tag_h3();'>
+	  <br />
+	  
+	  <input type="button" value="Code" style="font-weight:bold" onclick="add_code()">
+	  <br />
+	  <input type="button" value="Code" style="font-weight:bold;text-decoration:line-through;" onclick="remove_code()">
+	  <br />
+	
+	  <form id="addLink">
+	    <input type="text" name="addLinkInput" id="addLinkIn" value="URL Address here...">
+	    <input type="button" value="Link" style="font-weight:bold;" onclick="add_link()">
+	  </form>
+	  <br />
+	  <input type="button" value="Link" style="font-weight:bold;text-decoration:line-through;" onclick="remove_link()">
+	  
+	  <input type="button" value="print" style="font-weight:bold;" onclick="print_sel()">
+
+	
+	</div>  
+  
+  </div>
+
+</div>
+
+<div class="container-fluid">
+  <div class="row justify-content-center" style="padding:40px">
+    <div class="col-sm-8">
+      <form id="saveAs">
+        <button id="save">Save As</button>
+        <input type="text" name="pageName" id="pageName1" value="Page Name...">
+        .html
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

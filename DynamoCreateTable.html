@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.154.0.min.js"></script>
+
+<script language="javascript">
+
+var attrNum = 1;
+function add_Attribute()
+{
+	
+	var attrName = document.createElement("input");
+	attrName.type = "text";
+	attrName.name = "attrName" + attrNum;
+	attrName.id = "attrName" + attrNum;
+	attrName.placeholder = "Attribute Name...";
+	
+	var attrType = document.createElement("input");
+	attrType.type = "text";
+	attrType.name = "attrType" + attrNum;
+	attrType.id = "attrType" + attrNum;
+	attrType.placeholder = "Attribute Type (N or S)...";
+	
+	var keyType = document.createElement("input");
+	keyType.type = "text";
+	keyType.name = "keyType" + attrNum;
+	keyType.id = "keyType" + attrNum;
+	keyType.placeholder = "Key Type (HASH or RANGE)...";
+	
+	var br = document.createElement("br");
+	
+	document.getElementById("addPost").append(attrName);
+	document.getElementById("addPost").append(attrType);
+	document.getElementById("addPost").append(keyType);
+	document.getElementById("addPost").append(br);
+	
+	attrNum++;
+}
+
+function print_data()
+{
+	var $data = "";
+	$data = $data + document.getElementById("tableName").value + "<br>";
+	$data = $data + document.getElementById("capacityUnits").value + "<br>";
+	
+	//would first need a validation function if was actual thing
+	
+	for(i = 1; i < attrNum; i++)
+	{
+		$data = $data + "Name: " + document.getElementById("attrName" + i).value + "<br>"
+				+ "Type: " + document.getElementById("attrType" + i).value + "<br>"
+				+ "Key: " + document.getElementById("keyType" + i).value + "<br>";
+	}
+	
+	document.getElementById("tableForm").innerHTML = $data;
+}
+
+function print_array()
+{
+	var key = [];
+	
+	var arr = {};
+	var AttributeName = "AttributeName";
+	var val = "year";
+	
+	var KeyType = "KeyType";
+	var kval = "HASH";
+	
+	arr[AttributeName] = val;
+	arr[KeyType] = kval;
+	
+	key.push(arr);
+	
+	var arr = {};
+	var AttributeName = "AttributeName";
+	var val = "title";
+	
+	var KeyType = "KeyType";
+	var kval = "RANGE";
+	
+	arr[AttributeName] = val;
+	arr[KeyType] = kval;
+	
+	key.push(arr);
+	
+	var keyScheme = [
+            { AttributeName: "year", KeyType: "HASH"},
+            { AttributeName: "title", KeyType: "RANGE" }
+        ];
+	
+	//key.push({
+	//			value: "first",
+	//			label: "brandon"
+	//		});
+	document.getElementById("tableForm").innerHTML = key[0]["KeyType"];
+	if(key == keyScheme){
+		alert("yes");
+	}
+}
+
+AWS.config.update({
+  region: "us-west-2",
+  endpoint: 'http://localhost:8000',
+  // accessKeyId default can be used while using the downloadable version of DynamoDB. 
+  // For security reasons, do not store AWS Credentials in your files. Use Amazon Cognito instead.
+  accessKeyId: "fakeMyKeyId",
+  // secretAccessKey default can be used while using the downloadable version of DynamoDB. 
+  // For security reasons, do not store AWS Credentials in your files. Use Amazon Cognito instead.
+  secretAccessKey: "fakeSecretAccessKey"
+});
+
+var dynamodb = new AWS.DynamoDB();
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+function createTable() {
+
+	var currTableName = document.getElementById("tableName").value;
+	var currCapacity = document.getElementById("capacityUnits").value;
+	
+	var currKeySchema = [];
+	var currAttrDefs = [];
+	
+	//constructs dynamic table keys based on input(s)
+	for(i = 1; i < attrNum; i++)
+	{
+	
+		var key = {};
+		key["AttributeName"] = document.getElementById("attrName" + i).value;
+		key["KeyType"] = document.getElementById("keyType" + i).value;
+		
+		currKeySchema.push(key);
+		
+		var defs = {};
+		defs["AttributeName"] = key["AttributeName"];
+		defs["AttributeType"] = document.getElementById("attrType" + i).value;
+		
+		currAttrDefs.push(defs);
+	
+	}
+	
+	//currKeySchema = JSON.stringify(currKeySchema);
+	//currAttrDefs = JSON.stringify(currAttrDefs);
+	
+	console.log(currKeySchema);
+	console.log(currAttrDefs);
+
+
+    var params = {
+        TableName : currTableName,
+        KeySchema: currKeySchema,
+        AttributeDefinitions: currAttrDefs,
+        ProvisionedThroughput: {
+            ReadCapacityUnits: 5,
+            WriteCapacityUnits: 5
+        }
+    };
+
+    dynamodb.createTable(params, function(err, data) {
+        if (err) {
+            document.getElementById('textarea').innerHTML = "Unable to create table: " + "\n" + JSON.stringify(err, undefined, 2);
+        } else {
+            document.getElementById('textarea').innerHTML = "Created table: " + "\n" + JSON.stringify(data, undefined, 2);
+        }
+    });
+}
+
+function listTables(){
+	var params = {};
+	
+	dynamodb.listTables(params, function(err, data) {
+		if (err) // an error occurred
+		{
+			document.getElementById('textarea').innerHTML = err + "<br>" + err.stack;
+		}			
+		else // successful response
+		{
+			document.getElementById('textarea').innerHTML = JSON.stringify(data);
+		}			
+	});
+	
+}
+
+function describeTable(){
+
+	var tableName = document.getElementById("table").value;
+
+	var params = {
+		TableName: tableName
+	};
+	dynamodb.describeTable(params, function(err, data) {
+		if (err) // an error occurred
+		{
+			document.getElementById('textarea').innerHTML = err + "<br>" + err.stack;
+		}else // successful response
+		{
+			document.getElementById('textarea').innerHTML = JSON.stringify(data);
+		}          
+	});
+
+}
+
+function addItem()
+{
+	
+	
+	rating = parseFloat(document.getElementById("rating").value);
+	plot = document.getElementById("plot").value;
+	
+	title = document.getElementById("title").value;
+	year = parseFloat(document.getElementById("year").value);
+	
+	TableName = document.getElementById("tableNm").value;
+	
+	var params = {
+        TableName : TableName,
+        Item:{
+            "year": year,
+            "title": title,
+            "info":{
+                "plot": plot,
+                "rating": rating
+            }
+        }
+    };
+
+	console.log(JSON.stringify(params));
+	
+    docClient.put(params, function(err, data) {
+        if (err) {
+            document.getElementById('textarea').innerHTML = "Unable to add item: " + "\n" + JSON.stringify(err, undefined, 2);
+        } else {
+            document.getElementById('textarea').innerHTML = "PutItem succeeded: " + "\n" + JSON.stringify(data, undefined, 2);
+        }
+    });
+}
+
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+function scanTable() {
+
+	var tableName = document.getElementById("tableN").value;
+
+    document.getElementById('textarea').innerHTML += "Scanning Movies table." + "\n";
+
+    var params = {
+        TableName: tableName,
+        ProjectionExpression: "title, description"
+        //FilterExpression: "#yr between :start_yr and :end_yr",
+        //ExpressionAttributeNames: {
+        //    "#yr": "year",
+        //},
+        //ExpressionAttributeValues: {
+        //    ":start_yr": 1950,
+        //    ":end_yr": 1959
+        //}
+    };
+
+    docClient.scan(params, onScan);
+
+    function onScan(err, data) {
+        if (err) {
+            document.getElementById('textarea').innerHTML += "Unable to scan the table: " + "\n" + JSON.stringify(err, undefined, 2);
+        } else {
+            // Print all the movies
+            document.getElementById('textarea').innerHTML += "Scan succeeded. " + "\n";
+            data.Items.forEach(function(movie) {
+                document.getElementById('textarea').innerHTML += movie.title + ": " + movie.description + "\n";// + " - rating: " + movie.info.rating + "\n";
+            });
+
+            // Continue scanning if we have more movies (per scan 1MB limitation)
+            document.getElementById('textarea').innerHTML += "Scanning for more..." + "\n";
+            params.ExclusiveStartKey = data.LastEvaluatedKey;
+            docClient.scan(params, onScan);            
+        }
+    }
+}
+
+
+
+</script>
+</head>
+<body>
+
+<h1>Base Webpage</h1>
+
+<input type="button" name="listTables" id="listTables" value="List Tables" onclick="listTables()">
+<br>
+
+<input type="button" name="describeTable" id ="describeTable" value="Describe Table: " onclick="describeTable()">
+<input type="text" name="table" id="table" placeholder="Table Name..." value="">
+
+<form id="addPost">
+	
+	<input type="button" name="submit" id="submit" value="Create Table" onclick="createTable()">
+	<br>
+	TableName: <input type="text" name="tableName" id="tableName" value="">
+	<br>
+	Read and Write Capacity Units: <input type="text" name="capacityUnits" id="capacityUnits" value="">
+	<br>
+	<input type="button" value="Add Attribute to Table" style="font-weight:bold;" onclick="add_Attribute()">
+	<br>
+	
+</form>
+
+<form id="addItem">
+	<input type="text" name="tableNm" id="tableNm" placeholder="Table Name" value="">
+	<input type="text" name="year" id="year" placeholder="year..." value="">
+	<input type="text" name="title" id="title" placeholder="title..." value="">
+	<input type="text" name="plot" id="plot" placeholder="plot..." value="">
+	<input type="text" name="rating" id="rating" placeholder="rating..." value="">
+	<br>
+	
+	<input type="button" name="add_Item" id="add_Item" value="Add Item" onclick="addItem();">
+	<br>
+</form>
+
+<form id="search">
+	<input type="text" name="tableN" id="tableN" placeholder="Table Name" value="">
+	<input type="button" name="scan" id="scan" value="Scan Table" onclick="scanTable();">
+</form>
+
+<div id="tableForm">
+
+</div>
+
+<textarea readonly id= "textarea" placeholder="Relevant data from list, describe, and create table will show up here" style="width:600px; height:400px"></textarea>
+
+</body>
+
+</html>

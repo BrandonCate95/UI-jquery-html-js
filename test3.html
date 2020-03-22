@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script language="javascript">
+
+function eachRecursive(obj)
+{
+    for (var k in obj)
+    {
+        if (typeof obj[k] == "object" && obj[k] !== null)
+            eachRecursive(obj[k]);
+        else
+            console.log(k + ", " + obj[k]);
+    }
+}
+
+  // Convert JSON String to JavaScript Object with jQuery
+  
+  var objArray = [];
+  objArray[0] = {};
+  var k = "description"
+  alert(objArray);
+  objArray[0][k] = "description 1";
+  alert(objArray);
+  objArray[0]["title"] = "title 1";
+  objArray[1] = {};
+  objArray[1]["description"] = "description 2";
+  objArray[1]["title"] = "title 2";
+  var JSONString = "{\"status\":{\"rid\":\"rtjjo4As3xUK+qqj\",\"time-ms\":1},\"hits\":{\"found\":1,\"start\":0,\"hit\":[{\"id\":\"Amanda_Amanda_was_a_banaza_who_get_fanza_all_up_in_tanza...ria\",\"fields\":{\"description\":\"Amanda was a banaza who get fanza all up in tanza...ria\",\"title\":\"Amanda\"}}]}}"; // Replace ... with your JSON String
+  console.log(JSONString);
+  var obj = {"description":"This is the description", "title":"the is the title"};
+  console.log(obj["description"]);
+  var JSONObject = JSON.parse(JSONString);
+  console.log(typeof JSONObject);
+  console.log(eachRecursive(objArray));      // Dump all data of the Object in the console
+  //alert(JSONObject["hits"]); // Access Object data
+  
+  for (var key in JSONObject) {
+    if (JSONObject.hasOwnProperty(key)) {
+      console.log(key);
+    }
+  }
+
+</script>
+</head>
+<body>
+
+</body>
+
+</html>
